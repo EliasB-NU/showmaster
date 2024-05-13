@@ -1,0 +1,20 @@
+/* styles.css */
+
+#rows-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center horizontally */
+}
+
+.row {
+    padding: 10px;
+    margin: 5px;
+    border: 1px solid #ccc;
+    width: 80%; /* Adjust width as needed */
+    max-width: 500px; /* Limit maximum width */
+    text-align: center; /* Center text */
+}
+
+.highlighted {
+    color: green; /* Highlight color */
+}
