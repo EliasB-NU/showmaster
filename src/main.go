@@ -2,6 +2,7 @@ package main
 
 import (
 	"backend/src/config"
+	"backend/src/database"
 	"backend/src/web"
 	"fmt"
 	"log"
@@ -13,6 +14,7 @@ var (
 )
 
 func main() {
+	database.InitalCheckup()
 
 	// Serve static files
 	http.Handle("/", http.FileServer(http.Dir("./public")))

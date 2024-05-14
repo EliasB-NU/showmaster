@@ -16,5 +16,5 @@
 }
 
 .highlighted {
-    color: green; /* Highlight color */
+    background-color: green; /* Highlight color */
 }

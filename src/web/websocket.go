@@ -116,6 +116,8 @@ func AutoUpdate() {
 				if err != nil {
 					log.SetFlags(log.LstdFlags | log.Lshortfile)
 					log.Printf("Error sending message: %v\n", err)
+					client.Close()
+					delete(clients, client)
 				}
 			}
 		}

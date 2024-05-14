@@ -60,7 +60,7 @@ func HandleData(w http.ResponseWriter, r *http.Request) {
 	for rows.Next() {
 		var msg Message
 		if err := rows.Scan(&msg.Rows.ID, &msg.Rows.Name, &msg.Rows.Audio, &msg.Rows.Licht, &msg.Rows.PPTX, &msg.Rows.Notes); err != nil {
-			log.Printf("Error scanning row: %v", err)
+			log.Printf("Error scanning row: %v\n", err)
 			continue
 		}
 		if msg.Rows.ID == HighlightedRowID {
@@ -76,7 +76,7 @@ func HandleData(w http.ResponseWriter, r *http.Request) {
 	// Convert the rows and highlighted row ID to JSON
 	jsonData, err := json.Marshal(completeMSG)
 	if err != nil {
-		log.Printf("Error marshalling JSON: %v", err)
+		log.Printf("Error marshalling JSON: %v\n", err)
 		return
 	}
 
