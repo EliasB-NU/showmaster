@@ -1,0 +1,16 @@
+{
+    "DB": {
+        "Host": "localhost",
+        "Port": 5432,
+        "Username": "showmaster",
+        "Password": "SomeSecurePassword",
+        "Database": "showmaster"
+    },
+
+    "Website": {
+        "Host": "0.0.0.0",
+        "Port": 8080
+    },
+
+    "Project": "YourProject"
+}

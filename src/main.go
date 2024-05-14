@@ -1,150 +1,37 @@
 package main
 
 import (
-	"database/sql"
-	"encoding/json"
+	"backend/src/config"
+	"backend/src/web"
+	"fmt"
 	"log"
 	"net/http"
-
-	"github.com/gorilla/websocket"
-	_ "github.com/lib/pq"
 )
 
 var (
-	clients   = make(map[*websocket.Conn]bool)
-	broadcast = make(chan string)
-	upgrader  = websocket.Upgrader{
-		CheckOrigin: func(r *http.Request) bool {
-			return true
-		},
-	}
-	db *sql.DB
+	CFG config.CFG = *config.GetConfig()
 )
 
-type Row struct {
-	ID    int    `json:"id"`
-	Name  string `json:"name"`
-	Audio string `json:"audio"`
-	Licht string `json:"licht"`
-	PPTX  string `json:"pptx"`
-	Notes string `json:"notes"`
-}
-
-func init() {
-	var err error
-	// Connect to PostgreSQL database
-	db, err = sql.Open("postgres", "postgres://showmaster:eb12345678sh@192.168.178.35:5432/showmaster?sslmode=disable")
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
-var highlightedRowID = ""
-
-func handleConnections(w http.ResponseWriter, r *http.Request) {
-	// Upgrade initial GET request to a WebSocket
-	ws, err := upgrader.Upgrade(w, r, nil)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer ws.Close()
-
-	// Register new client
-	clients[ws] = true
-
-	// Send all rows and the highlighted row ID to the newly connected client
-	sendAllRows(ws)
-	if err := ws.WriteMessage(websocket.TextMessage, []byte(highlightedRowID)); err != nil {
-		log.Printf("Error sending highlighted row ID: %v", err)
-	}
-
-	for {
-		// Listen for new messages from the client
-		_, message, err := ws.ReadMessage()
-		if err != nil {
-			log.Printf("Error reading message: %v", err)
-			delete(clients, ws)
-			return
-		}
-
-		// Update the highlighted row ID and broadcast it to all clients
-		highlightedRowID = string(message)
-		broadcast <- highlightedRowID
-	}
-}
-
-// Update the sendAllRows function to include the highlighted row ID
-func sendAllRows(ws *websocket.Conn) {
-	// Fetch all rows from the database
-	rows, err := db.Query("SELECT id, name, audio, licht, pptx, notes FROM test")
-	if err != nil {
-		log.Printf("Error fetching rows: %v", err)
-		return
-	}
-	defer rows.Close()
-
-	// Iterate over the rows and construct Row objects
-	var allRows []Row
-	for rows.Next() {
-		var row Row
-		if err := rows.Scan(&row.ID, &row.Name, &row.Audio, &row.Licht, &row.PPTX, &row.Notes); err != nil {
-			log.Printf("Error scanning row: %v", err)
-			continue
-		}
-		allRows = append(allRows, row)
-	}
-	if err := rows.Err(); err != nil {
-		log.Printf("Error iterating over rows: %v", err)
-		return
-	}
-
-	// Convert the rows and highlighted row ID to JSON
-	jsonData, err := json.Marshal(allRows)
-	if err != nil {
-		log.Printf("Error marshalling JSON: %v", err)
-		return
-	}
-
-	// Send JSON data to the client
-	if err := ws.WriteMessage(websocket.TextMessage, jsonData); err != nil {
-		log.Printf("Error writing JSON data to client: %v", err)
-		return
-	}
-}
-
-// Update the handleMessages function to broadcast the highlighted row ID to all clients
-func handleMessages() {
-	for {
-		// Wait for a new highlighted row ID to be broadcasted
-		newRowID := <-broadcast
-
-		// Send the new highlighted row ID to all connected clients
-		for client := range clients {
-			if err := client.WriteMessage(websocket.TextMessage, []byte(newRowID)); err != nil {
-				log.Printf("Error sending highlighted row ID to client: %v", err)
-				client.Close()
-				delete(clients, client)
-			}
-		}
-	}
-}
-
 func main() {
-	defer db.Close()
 
 	// Serve static files
 	http.Handle("/", http.FileServer(http.Dir("./public")))
 
 	// Handle WebSocket connections
-	http.HandleFunc("/ws", handleConnections)
+	http.HandleFunc("/ws", web.HandleConnections)
 
-	// Start listening for incoming chat messages
-	go handleMessages()
+	// Handle update on highlighted row
+	http.HandleFunc("/api/highlightedrow", web.GetHighlightedRow)
+
+	// For updating data
+	http.HandleFunc("/api/data", web.HandleData)
 
 	// Start the server
-	log.Println("Server is running on :8080")
-	err := http.ListenAndServe(":8080", nil)
+	server := fmt.Sprintf("%s:%d", CFG.Website.Host, CFG.Website.Port)
+	log.Printf("Server is running on %s\n", server)
+	err := http.ListenAndServe(server, nil)
 	if err != nil {
-		log.Fatal("Error starting server:", err)
+		log.SetFlags(log.LstdFlags | log.Lshortfile)
+		log.Fatalf("Error starting server: %d\n", err)
 	}
 }
