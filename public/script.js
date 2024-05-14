@@ -1,18 +1,24 @@
 // script.js
 
-const ws = new WebSocket('ws://localhost:8080/ws');
+const ws = new WebSocket('ws://192.168.178.164:8080/ws');
 
 ws.onopen = function(event) {
     console.log('WebSocket connection established.');
 };
 
 ws.onmessage = function(event) {
-    if (event.data === 'refresh') {
-        location.reload();
-    }
+    console.log(event.data);
     const msgs = JSON.parse(event.data);
-    displayRows(msgs);
+    if (msgs === "refresh") {
+        location.reload();
+    } else {
+        displayRows(msgs);
+    }
+    
 };
+
+var highlightedRow = -1
+var rows = []
 
 function displayRows(msgs) {
     msgs.sort((a, b) => a.row.id - b.row.id);
@@ -21,6 +27,7 @@ function displayRows(msgs) {
     container.innerHTML = ''; // Clear existing content    
 
     msgs.forEach(msg => {
+        rows.push(msg.row.id);
         const rowElement = document.createElement('div');
         rowElement.textContent = `${msg.row.id}: ${msg.row.name} | ${msg.row.audio} | ${msg.row.licht} | ${msg.row.pptx} | ${msg.row.notes}`;
         rowElement.classList.add('row'); // Add CSS class to row
@@ -28,6 +35,7 @@ function displayRows(msgs) {
         container.appendChild(rowElement);
         if (msg.highlighted === true) {
             rowElement.classList.add('highlighted');
+            highlightedRow = rows.indexOf(msg.row.id);
         } else {
             rowElement.classList.remove('highlighted')
         }
@@ -39,6 +47,18 @@ function displayRows(msgs) {
     });
 }
 
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        console.log(rows[highlightedRow+1]);
+        sendDataToBackend(rows[highlightedRow+1]);
+    } else if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        console.log(rows[highlightedRow-1]);
+        sendDataToBackend(rows[highlightedRow-1]);
+    }
+})
+
 function sendDataToBackend(number) {
     // Construct the data to send
     const data = {
@@ -46,7 +66,7 @@ function sendDataToBackend(number) {
     };
 
     // Make the POST request
-    fetch('http://localhost:8080/api/highlightedrow', {
+    fetch('http://192.168.178.164:8080/api/highlightedrow', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'

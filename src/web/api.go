@@ -46,7 +46,8 @@ func HandleData(w http.ResponseWriter, r *http.Request) {
 	// Fetch all rows from the database
 	var db sql.DB = *database.InitDB()
 	defer db.Close()
-	rows, err := db.Query("SELECT id, name, audio, licht, pptx, notes FROM test")
+	sql := fmt.Sprintf("SELECT id, name, audio, licht, pptx, notes FROM %s", CFG.ProjectName)
+	rows, err := db.Query(sql)
 	if err != nil {
 		log.SetFlags(log.LstdFlags | log.Lshortfile)
 		log.Printf("Error fetching rows: %v", err)
@@ -58,7 +59,7 @@ func HandleData(w http.ResponseWriter, r *http.Request) {
 	var completeMSG []Message
 	for rows.Next() {
 		var msg Message
-		if err := rows.Scan(&msg.Rows.ID, &msg.Rows.Name, &msg.Rows.Audio, &msg.Rows.Licht, &msg.Rows.PPTX, &msg.Rows.Name); err != nil {
+		if err := rows.Scan(&msg.Rows.ID, &msg.Rows.Name, &msg.Rows.Audio, &msg.Rows.Licht, &msg.Rows.PPTX, &msg.Rows.Notes); err != nil {
 			log.Printf("Error scanning row: %v", err)
 			continue
 		}
@@ -83,5 +84,6 @@ func HandleData(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	// Write JSON response
+	w.WriteHeader(http.StatusOK)
 	w.Write(jsonData)
 }

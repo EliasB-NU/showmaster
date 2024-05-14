@@ -19,6 +19,8 @@ func main() {
 
 	// Handle WebSocket connections
 	http.HandleFunc("/ws", web.HandleConnections)
+	go web.AutoUpdate()
+	defer web.WS.Close()
 
 	// Handle update on highlighted row
 	http.HandleFunc("/api/highlightedrow", web.GetHighlightedRow)

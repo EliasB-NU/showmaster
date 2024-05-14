@@ -12,5 +12,6 @@
         "Port": 8080
     },
 
-    "Project": "YourProject"
+    // Corresponding to the tablename in the database
+    "Project": "yourproject"
 }
