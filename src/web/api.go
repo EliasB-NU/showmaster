@@ -4,6 +4,7 @@ import (
 	"backend/src/database"
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 )
@@ -32,6 +33,13 @@ func GetHighlightedRow(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(response)
 
 	HighlightedRowID = float32(data.Number)
+
+	requestURL := fmt.Sprintf("http://localhost:%d/api/refresh", CFG.Website.Port)
+	_, err := http.Get(requestURL)
+	if err != nil {
+		log.SetFlags(log.LstdFlags | log.Lshortfile)
+		log.Printf("Error sending refresh request to clients: %v\n", err)
+	}
 }
 
 func HandleData(w http.ResponseWriter, r *http.Request) {
@@ -40,6 +48,7 @@ func HandleData(w http.ResponseWriter, r *http.Request) {
 	defer db.Close()
 	rows, err := db.Query("SELECT id, name, audio, licht, pptx, notes FROM test")
 	if err != nil {
+		log.SetFlags(log.LstdFlags | log.Lshortfile)
 		log.Printf("Error fetching rows: %v", err)
 		return
 	}

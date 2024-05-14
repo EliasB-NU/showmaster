@@ -7,6 +7,9 @@ ws.onopen = function(event) {
 };
 
 ws.onmessage = function(event) {
+    if (event.data === 'refresh') {
+        location.reload();
+    }
     const msgs = JSON.parse(event.data);
     displayRows(msgs);
 };
@@ -63,17 +66,3 @@ function sendDataToBackend(number) {
         console.error('Error sending data to backend:', error);
     });
 }
-
-function fetchData() {
-    fetch('localhost:8080/api/data')
-        .then(response => response.json())
-        .then(data => {
-            displayRows(data);
-        })
-        .catch(error => console.error('Error fetching data:', error));
-}
-
-
-setInterval(function() {
-    fetchData();
-}, 1000);
