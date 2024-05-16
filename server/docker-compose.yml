@@ -5,7 +5,7 @@ services:
     restart: always
     environment:
       - POSTGRES_USER=showmaster
-      - POSTGRES_PASSWORD=examplePassword
+      - POSTGRES_PASSWORD=SomeSecurePassword
     ports:
       - 5432:5432
     volumes:
@@ -14,8 +14,7 @@ services:
   pgadmin:
     image: dpage/pgadmin4:latest
     environment:
-      - PGADMIN_DEFAULT_USER=admin
       - PGADMIN_DEFAULT_EMAIL=admin@example.com
-      - PGADMIN_DEFAULT_PASSWORD=examplePassword
+      - PGADMIN_DEFAULT_PASSWORD=SomeSecurePassword
     ports:
       - 8080:80

@@ -9,7 +9,7 @@
 
     "Website": {
         "Host": "0.0.0.0",
-        "Port": 8080
+        "Port": 80
     },
 
     // Corresponding to the tablename in the database
