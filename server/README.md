@@ -1,0 +1,1 @@
+If working, the setup.sh can setup everything for you, currently work in Progress

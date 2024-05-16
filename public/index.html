@@ -4,12 +4,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Database Visualizer</title>
+    <title>ShowMaster - V1</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Test 2</h1>
-    <div id="rows-container"></div>
+    <header>
+        <h1>ShowMaster - V1</h1>
+    </header>
+    <div id="container">
+        <table id="dataTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Audio</th>
+                    <th>Licht</th>
+                    <th>PPTX</th>
+                    <th>Notes</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <!-- Data rows will be inserted here -->
+            </tbody>
+        </table>
+    </div>
+    <footer>
+        Created by: Elias Braun || <a href="https://github.com/EliasB-NU/showmaster/">GitHub</a>
+    </footer>
     <script src="script.js"></script>
 </body>
 </html>

@@ -10,7 +10,7 @@ ws.onmessage = function(event) {
     console.log(event.data);
     const msgs = JSON.parse(event.data);
     if (msgs === "refresh") {
-        location.reload();
+        fetchData();
     } else {
         displayRows(msgs);
     }
@@ -23,24 +23,35 @@ var rows = []
 function displayRows(msgs) {
     msgs.sort((a, b) => a.row.id - b.row.id);
 
-    const container = document.getElementById('rows-container');
+    const container = document.getElementById('tableBody');
     container.innerHTML = ''; // Clear existing content    
 
     msgs.forEach(msg => {
         rows.push(msg.row.id);
-        const rowElement = document.createElement('div');
-        rowElement.textContent = `${msg.row.id}: ${msg.row.name} | ${msg.row.audio} | ${msg.row.licht} | ${msg.row.pptx} | ${msg.row.notes}`;
-        rowElement.classList.add('row'); // Add CSS class to row
-        rowElement.dataset.id = msg.row.id; // Set data-id attribute
-        container.appendChild(rowElement);
+        const tr = document.createElement('tr');
+        tr.dataset.id = msg.row.id;
+        tr.innerHTML = `
+            <td>${msg.row.id}</td>
+            <td>${msg.row.name}</td>
+            <td>${msg.row.audio}</td>
+            <td>${msg.row.licht}</td>
+            <td>${msg.row.pptx}</td>
+            <td>${msg.row.notes}</td>
+        `;
+        tableBody.appendChild(tr);
+
         if (msg.highlighted === true) {
-            rowElement.classList.add('highlighted');
+            const highlightedRowVar = document.querySelector(`tr[data-id="${msg.row.id}"]`);
+            setTimeout(() => {
+                highlightedRowVar.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 100);
+            highlightedRowVar.classList.add('highlighted');
             highlightedRow = rows.indexOf(msg.row.id);
         } else {
-            rowElement.classList.remove('highlighted')
+            tr.classList.remove('highlighted')
         }
 
-        rowElement.addEventListener('click', () => {
+        tr.addEventListener('click', () => {
             console.log(msg.row.id)
             sendDataToBackend(msg.row.id)
         })
@@ -85,4 +96,13 @@ function sendDataToBackend(number) {
     .catch(error => {
         console.error('Error sending data to backend:', error);
     });
+}
+
+function fetchData() {
+    fetch('http://192.168.178.164:8080/api/data')
+        .then(response => response.json())
+        .then(data => {
+            displayRows(data);
+        })
+        .catch(error => console.error('Error fetching data:', error));
 }

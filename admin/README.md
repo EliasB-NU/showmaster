@@ -1,0 +1,1 @@
+Maybe I will creat an admin table in the future, bot for now, I don't see a reason behind it. You can easily edit the entries with Jetbrains DataGrip or psql admin.

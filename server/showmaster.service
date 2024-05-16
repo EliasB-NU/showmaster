@@ -1,0 +1,19 @@
+#Coming Soon Service File
+#Read the Read.Md for more Information
+
+[Unit]
+Description=showmaster
+
+Wants=network.target
+After=syslog.target network-online.target
+
+[Service]
+Type=simple
+ExecStart=/opt/showmaster/main
+WorkingDirectory=/opt/showmaster/
+Restart=on-failure
+RestartSec=10
+KillMode=process
+
+[Install]
+WantedBy=multi-user.target
