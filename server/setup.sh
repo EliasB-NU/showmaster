@@ -7,7 +7,7 @@ sudo bash get-docker.sh
 
 # Create Folder & get docker psql running
 sudo mkdir /opt/stacks/psql && cd /opt/stacks/psql
-sudo wget https://github.com/EliasB-NU/showmaster/blob/b4cf62a82f8fd229f43c71b65e6b334bc4332533/server/docker-compose.yml
+sudo wget https://github.com/EliasB-NU/showmaster/blob/master/server/docker-compose.yml
 docker compose up -d
 
 # Create Folder for Project and clone it

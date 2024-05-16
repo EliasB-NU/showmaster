@@ -1,19 +1,15 @@
-#Coming Soon Service File
-#Read the Read.Md for more Information
-
 [Unit]
-Description=showmaster
-
-Wants=network.target
-After=syslog.target network-online.target
+Description=ShowMaster Server
 
 [Service]
-Type=simple
-ExecStart=/opt/showmaster/main
+User=root
 WorkingDirectory=/opt/showmaster/
+LimitNOFILE=4096
+ExecStart=/opt/showmaster/main
 Restart=on-failure
-RestartSec=10
-KillMode=process
+StartLimitInterval=180
+StartLimitBurst=30
+RestartSec=5s
 
 [Install]
 WantedBy=multi-user.target
