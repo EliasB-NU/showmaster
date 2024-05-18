@@ -35,6 +35,7 @@ func GetHighlightedRow(w http.ResponseWriter, r *http.Request) {
 		"message": "Number received successfully",
 	}
 	json.NewEncoder(w).Encode(response)
+	w.WriteHeader(http.StatusOK)
 
 	HighlightedRowID = float32(data.Number)
 }

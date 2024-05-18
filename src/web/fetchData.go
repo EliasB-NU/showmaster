@@ -59,4 +59,5 @@ func HandleData(w http.ResponseWriter, r *http.Request) {
 
 	// Write JSON response
 	w.Write(jsonData)
+	w.WriteHeader(http.StatusOK)
 }
