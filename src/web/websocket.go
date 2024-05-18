@@ -45,6 +45,7 @@ func HandleConnections(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.SetFlags(log.LstdFlags | log.Lshortfile)
 		log.Printf("Error initiating websocket connection with client: %v\n", err)
+		return
 	}
 
 	// Register new client
