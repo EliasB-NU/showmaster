@@ -1,6 +1,6 @@
 // script.js
 
-const ws = new WebSocket('ws://YOURIP:80/ws');
+const ws = new WebSocket('/ws/');
 
 ws.onopen = function(event) {
     console.log('WebSocket connection established.');
@@ -77,7 +77,7 @@ function sendDataToBackend(number) {
     };
 
     // Make the POST request
-    fetch('http://YOURIP:80/api/highlightedrow', {
+    fetch('/api/highlightedrow', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -99,7 +99,7 @@ function sendDataToBackend(number) {
 }
 
 function fetchData() {
-    fetch('http://YOURIP:80/api/data')
+    fetch('/api/data')
         .then(response => response.json())
         .then(data => {
             displayRows(data);

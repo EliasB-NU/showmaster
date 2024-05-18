@@ -1,46 +1,13 @@
 package web
 
 import (
-	"backend/src/database"
 	"database/sql"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
+	"showmaster/src/database"
 )
-
-type NumberData struct {
-	Number float32 `json:"number"`
-}
-
-func GetHighlightedRow(w http.ResponseWriter, r *http.Request) {
-	// Decode the JSON request body
-	var data NumberData
-	if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	// Process the received number
-	receivedNumber := data.Number
-	log.Printf("Received number: %f\n", receivedNumber)
-
-	// Respond to the client
-	response := map[string]interface{}{
-		"message": "Number received successfully",
-	}
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
-
-	HighlightedRowID = float32(data.Number)
-
-	requestURL := fmt.Sprintf("http://localhost:%d/api/refresh", CFG.Website.Port)
-	_, err := http.Get(requestURL)
-	if err != nil {
-		log.SetFlags(log.LstdFlags | log.Lshortfile)
-		log.Printf("Error sending refresh request to clients: %v\n", err)
-	}
-}
 
 func HandleData(w http.ResponseWriter, r *http.Request) {
 	// Fetch all rows from the database
@@ -85,7 +52,7 @@ func HandleData(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "http://0.0.0.0:8080")
-	w.Header().Set("Access-Control-Allow-Methods", "POST, PUT, PATCH, GET, DELETE")
+	w.Header().Set("Access-Control-Allow-Methods", "GET")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
 	w.Header().Set("Access-Control-Allow-Credentials", "true")
 	w.Header().Set("Access-Control-Allow-Headers", allowHeaders)
