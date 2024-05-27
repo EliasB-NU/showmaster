@@ -8,11 +8,11 @@ import (
 
 type CFG struct {
 	DB struct {
-		Host      string `json:"Host"`
-		Port      int    `json:"Port"`
-		Username  string `json:"Username"`
-		Password  string `json:"Password"`
-		Daatabase string `json:"Database"`
+		Host     string `json:"Host"`
+		Port     int    `json:"Port"`
+		Username string `json:"Username"`
+		Password string `json:"Password"`
+		Database string `json:"Database"`
 	} `json:"DB"`
 
 	Website struct {

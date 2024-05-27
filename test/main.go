@@ -12,11 +12,11 @@ import (
 
 type CFG struct {
 	DB struct {
-		Host      string `json:"Host"`
-		Port      int    `json:"Port"`
-		Username  string `json:"Username"`
-		Password  string `json:"Password"`
-		Daatabase string `json:"Database"`
+		Host     string `json:"Host"`
+		Port     int    `json:"Port"`
+		Username string `json:"Username"`
+		Password string `json:"Password"`
+		Database string `json:"Database"`
 	} `json:"DB"`
 
 	Website struct {
@@ -47,7 +47,7 @@ var config CFG = *GetConfig()
 
 func InitDB() *sql.DB {
 	// Connect to PostgreSQL database
-	psql := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable", config.DB.Username, config.DB.Password, config.DB.Host, config.DB.Port, config.DB.Daatabase)
+	psql := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable", config.DB.Username, config.DB.Password, config.DB.Host, config.DB.Port, config.DB.Database)
 	db, err := sql.Open("postgres", psql)
 	if err != nil {
 		log.SetFlags(log.LstdFlags | log.Lshortfile)
