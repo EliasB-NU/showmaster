@@ -13,6 +13,8 @@ import (
 )
 
 var (
+	err error
+
 	CFG    config.CFG = *config.GetConfig()
 	server            = fmt.Sprintf("%s:%d", CFG.Website.Host, CFG.Website.Port)
 	mux               = http.NewServeMux()
@@ -22,8 +24,7 @@ func main() {
 	database.InitalCheckup()
 
 	// Serve Websites
-  mux.Handle("/", http.FileServer(http.Dir("./public")))
-  mux.Handle("/admin", http.FileServer(http.Dir("./admin")))
+	mux.Handle("/", http.FileServer(http.Dir("./public")))
 
 	// Handle WebSocket connections
 	mux.HandleFunc("/ws", web.HandleConnections)
@@ -37,14 +38,14 @@ func main() {
 	mux.HandleFunc("/api/data", web.HandleData)
 
 	// New Insert
-  mux.HandleFunc("/api/newinsert", web.NewInsert)
+	mux.HandleFunc("/api/newinsert", web.NewInsert)
 
-  // Cors
+	// Cors
 	handler := cors.Default().Handler(mux)
-  
+
 	// Start the server
 	log.Printf("Server is running on %s\n", server)
-	err := http.ListenAndServe(server, handler)
+	err = http.ListenAndServe(server, handler)
 	if err != nil {
 		log.SetFlags(log.LstdFlags | log.Lshortfile)
 		log.Fatalf("Error starting server: %d\n", err)

@@ -11,14 +11,6 @@ type NumberData struct {
 }
 
 func GetHighlightedRow(w http.ResponseWriter, r *http.Request) {
-	allowHeaders := "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization"
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Methods", "POST")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
-	w.Header().Set("Access-Control-Allow-Credentials", "true")
-	w.Header().Set("Access-Control-Allow-Headers", allowHeaders)
-
 	// Decode the JSON request body
 	var data NumberData
 	if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
@@ -35,7 +27,6 @@ func GetHighlightedRow(w http.ResponseWriter, r *http.Request) {
 		"message": "Number received successfully",
 	}
 	json.NewEncoder(w).Encode(response)
-	w.WriteHeader(http.StatusOK)
 
 	HighlightedRowID = float32(data.Number)
 }

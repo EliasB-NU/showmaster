@@ -47,17 +47,6 @@ func HandleData(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Set response headers
-	allowHeaders := "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization"
-
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Methods", "GET")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
-	w.Header().Set("Access-Control-Allow-Credentials", "true")
-	w.Header().Set("Access-Control-Allow-Headers", allowHeaders)
-
 	// Write JSON response
 	w.Write(jsonData)
-	w.WriteHeader(http.StatusOK)
 }
