@@ -1,5 +1,4 @@
 // script.js
-
 const ws = new WebSocket('/ws');
 
 ws.onopen = function(event) {

@@ -1,14 +1,15 @@
 package main
 
 import (
-	"backend/src/config"
-	"backend/src/database"
-	"backend/src/web"
 	"fmt"
 	"log"
 	"net/http"
 
 	"github.com/rs/cors"
+
+	"showmaster/src/config"
+	"showmaster/src/database"
+	"showmaster/src/web"
 )
 
 var (
@@ -20,8 +21,9 @@ var (
 func main() {
 	database.InitalCheckup()
 
-	// Serve static files
-	mux.Handle("/", http.FileServer(http.Dir("./public")))
+	// Serve Websites
+  mux.Handle("/", http.FileServer(http.Dir("./public")))
+  mux.Handle("/admin", http.FileServer(http.Dir("./admin")))
 
 	// Handle WebSocket connections
 	mux.HandleFunc("/ws", web.HandleConnections)
@@ -34,9 +36,12 @@ func main() {
 	// For updating data
 	mux.HandleFunc("/api/data", web.HandleData)
 
-	// Cors
-	handler := cors.Default().Handler(mux)
+	// New Insert
+  mux.HandleFunc("/api/newinsert", web.NewInsert)
 
+  // Cors
+	handler := cors.Default().Handler(mux)
+  
 	// Start the server
 	log.Printf("Server is running on %s\n", server)
 	err := http.ListenAndServe(server, handler)
