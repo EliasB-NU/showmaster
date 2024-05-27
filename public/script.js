@@ -1,6 +1,5 @@
 // script.js
-
-const ws = new WebSocket('/ws/');
+const ws = new WebSocket('/ws');
 
 ws.onopen = function(event) {
     console.log('WebSocket connection established.');

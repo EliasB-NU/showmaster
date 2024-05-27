@@ -13,7 +13,7 @@ var CFG config.CFG = *config.GetConfig()
 
 func InitDB() *sql.DB {
 	// Connect to PostgreSQL database
-	psql := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable", CFG.DB.Username, CFG.DB.Password, CFG.DB.Host, CFG.DB.Port, CFG.DB.Daatabase)
+	psql := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable", CFG.DB.Username, CFG.DB.Password, CFG.DB.Host, CFG.DB.Port, CFG.DB.Database)
 	db, err := sql.Open("postgres", psql)
 	if err != nil {
 		log.SetFlags(log.LstdFlags | log.Lshortfile)
@@ -24,7 +24,7 @@ func InitDB() *sql.DB {
 }
 
 func InitalCheckup() {
-	psql := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable", CFG.DB.Username, CFG.DB.Password, CFG.DB.Host, CFG.DB.Port, CFG.DB.Daatabase)
+	psql := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable", CFG.DB.Username, CFG.DB.Password, CFG.DB.Host, CFG.DB.Port, CFG.DB.Database)
 	db, err := sql.Open("postgres", psql)
 	if err != nil {
 		log.SetFlags(log.LstdFlags | log.Lshortfile)
