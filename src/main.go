@@ -17,7 +17,14 @@ var (
 
 	CFG    config.CFG = *config.GetConfig()
 	server            = fmt.Sprintf("%s:%d", CFG.Website.Host, CFG.Website.Port)
-	mux               = http.NewServeMux()
+
+	mux = http.NewServeMux()
+	c   = cors.New(cors.Options{
+		AllowedOrigins:       []string{"*"},
+		AllowedMethods:       []string{"GET", "POST"},
+		AllowPrivateNetwork:  true,
+		OptionsSuccessStatus: 200,
+	})
 )
 
 func main() {
@@ -41,7 +48,7 @@ func main() {
 	mux.HandleFunc("/api/newinsert", web.NewInsert)
 
 	// Cors
-	handler := cors.Default().Handler(mux)
+	handler := c.Handler(mux)
 
 	// Start the server
 	log.Printf("Server is running on %s\n", server)
