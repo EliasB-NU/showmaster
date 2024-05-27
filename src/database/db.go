@@ -1,10 +1,10 @@
 package database
 
 import (
-	"backend/src/config"
 	"database/sql"
 	"fmt"
 	"log"
+	"showmaster/src/config"
 
 	_ "github.com/lib/pq"
 )

@@ -1,13 +1,13 @@
 package web
 
 import (
-	"backend/src/config"
-	"backend/src/database"
 	"database/sql"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
+	"showmaster/src/config"
+	"showmaster/src/database"
 
 	"github.com/gorilla/websocket"
 )
@@ -20,10 +20,12 @@ var (
 			return true
 		},
 	}
-	err error
-)
 
-var CFG config.CFG = *config.GetConfig()
+	refreshMSG       string     = "refresh"
+	CFG              config.CFG = *config.GetConfig()
+	HighlightedRowID float32    = -1
+	Update           bool       = false
+)
 
 type Message struct {
 	Rows struct {
@@ -37,15 +39,13 @@ type Message struct {
 	Highlighted bool `json:"highlighted"`
 }
 
-var refreshMSG string = "refresh"
-
-var HighlightedRowID float32 = -1
-
 func HandleConnections(w http.ResponseWriter, r *http.Request) {
 	// Upgrade initial GET request to a WebSocket
-	WS, err = upgrader.Upgrade(w, r, nil)
+	WS, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		log.Fatal(err)
+		log.SetFlags(log.LstdFlags | log.Lshortfile)
+		log.Printf("Error initiating websocket connection with client: %v\n", err)
+		return
 	}
 
 	// Register new client
@@ -109,8 +109,9 @@ func AutoUpdate() {
 	}
 	for {
 		// Send the new highlighted row to all connected clients
-		if previousRow != HighlightedRowID {
+		if previousRow != HighlightedRowID || Update {
 			previousRow = HighlightedRowID
+			Update = false
 			for client := range clients {
 				err = client.WriteMessage(websocket.TextMessage, jsonData)
 				if err != nil {

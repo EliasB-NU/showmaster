@@ -1,5 +1,4 @@
 // script.js
-
 const ws = new WebSocket('/ws');
 
 ws.onopen = function(event) {
@@ -44,7 +43,7 @@ function displayRows(msgs) {
             const highlightedRowVar = document.querySelector(`tr[data-id="${msg.row.id}"]`);
             setTimeout(() => {
                 highlightedRowVar.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }, 100);
+            }, 150);
             highlightedRowVar.classList.add('highlighted');
             highlightedRow = rows.indexOf(msg.row.id);
         } else {

@@ -1,26 +1,36 @@
 package main
 
 import (
-	"backend/src/config"
-	"backend/src/database"
-	"backend/src/web"
 	"fmt"
 	"log"
 	"net/http"
 
 	"github.com/rs/cors"
+
+	"showmaster/src/config"
+	"showmaster/src/database"
+	"showmaster/src/web"
 )
 
 var (
+	err error
+
 	CFG    config.CFG = *config.GetConfig()
 	server            = fmt.Sprintf("%s:%d", CFG.Website.Host, CFG.Website.Port)
-	mux               = http.NewServeMux()
+
+	mux = http.NewServeMux()
+	c   = cors.New(cors.Options{
+		AllowedOrigins:       []string{"*"},
+		AllowedMethods:       []string{"GET", "POST"},
+		AllowPrivateNetwork:  true,
+		OptionsSuccessStatus: 200,
+	})
 )
 
 func main() {
 	database.InitalCheckup()
 
-	// Serve static files
+	// Serve Websites
 	mux.Handle("/", http.FileServer(http.Dir("./public")))
 
 	// Handle WebSocket connections
@@ -34,12 +44,15 @@ func main() {
 	// For updating data
 	mux.HandleFunc("/api/data", web.HandleData)
 
+	// New Insert
+	mux.HandleFunc("/api/newinsert", web.NewInsert)
+
 	// Cors
-	handler := cors.Default().Handler(mux)
+	handler := c.Handler(mux)
 
 	// Start the server
 	log.Printf("Server is running on %s\n", server)
-	err := http.ListenAndServe(server, handler)
+	err = http.ListenAndServe(server, handler)
 	if err != nil {
 		log.SetFlags(log.LstdFlags | log.Lshortfile)
 		log.Fatalf("Error starting server: %d\n", err)

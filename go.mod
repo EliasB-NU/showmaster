@@ -1,4 +1,4 @@
-module backend
+module showmaster
 
 go 1.22.3
 
