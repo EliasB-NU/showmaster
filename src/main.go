@@ -38,14 +38,14 @@ func main() {
 	go web.AutoUpdate()
 	defer web.WS.Close()
 
-	// Handle update on highlighted row
+	// Entries
 	mux.HandleFunc("/api/highlightedrow", web.GetHighlightedRow)
-
-	// For updating data
 	mux.HandleFunc("/api/data", web.HandleData)
-
-	// New Insert
 	mux.HandleFunc("/api/newinsert", web.NewInsert)
+
+	// Timer
+	mux.HandleFunc("/api/stopwatch-update", web.ButtonUpdate)
+	mux.HandleFunc("/api/stopwatch-status", web.GetCurrentTime)
 
 	// Cors
 	handler := c.Handler(mux)
