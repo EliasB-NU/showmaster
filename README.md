@@ -9,12 +9,5 @@ The currently highlighted row is synced with every device.
 To add data to showmaster, you need to use an database tool like Jetbrains DataGrip or pqAdmin, maybe I will create an admin panel in the future. 
 
 ## Setup
-To use this tool, you need a postgresql database and you just need to add all the details to the config file in the config folder (don't forget to change the name from "config.example.json" to "config.json").
-
-The correspending table is created with the name given under the "Project" entry, if you allready created a table with the same name as the "Project" name, it will not be overwritten and the entries you already created will be used.
-
-You have to replace the YOURIP statement in the "public/script.js" file with the ip the frontend will run on.
-
-In the server folder is an .service file, which automaticly starts the programm after you compiled the go project. Please check folder location. 
-
-If you have question, contact me via email (braunelias@tghd.email) or Discord (tg_eliasb)
+Just copy the contents of the "docker compose" file to your local machine, I assume you have docker & docker compose installed, and run it. By changing the project name and restarting, the showmaster programm creates a new table, so you can easily switch between projects.  
+To easily add data, I included a pgadmin4 service, you can include it, to get an fast and easy option to view and edit the database in the web. 
