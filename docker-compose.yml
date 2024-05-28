@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   app:
-    image: braunelias/showmaster:1.0
+    image: braunelias/showmaster:latest
     restart: always
     networks:
       - showmaster-network
