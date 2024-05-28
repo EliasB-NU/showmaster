@@ -10,23 +10,30 @@
 <body>
     <header>
         <h1>ShowMaster - V1</h1>
+        <div id="stopwatch">
+            <span id="timer">00:00:00</span>
+            <button id="startPauseBtn">Start</button>
+            <button id="resetBtn">Reset</button>
+        </div>
     </header>
     <div id="container">
-        <table id="dataTable">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Audio</th>
-                    <th>Licht</th>
-                    <th>PPTX</th>
-                    <th>Notes</th>
-                </tr>
-            </thead>
-            <tbody id="tableBody">
-                <!-- Data rows will be inserted here -->
-            </tbody>
-        </table>
+        <div class="table-container">
+            <table id="dataTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Audio</th>
+                        <th>Licht</th>
+                        <th>PPTX</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <!-- Data rows will be inserted here -->
+                </tbody>
+            </table>
+        </div>
     </div>
     <footer>
         Created by: Elias Braun || <a href="https://github.com/EliasB-NU/showmaster/">GitHub</a>

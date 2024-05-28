@@ -115,12 +115,49 @@ func AutoUpdate() {
 			for client := range clients {
 				err = client.WriteMessage(websocket.TextMessage, jsonData)
 				if err != nil {
-					log.SetFlags(log.LstdFlags | log.Lshortfile)
-					log.Printf("Error sending message: %v\n", err)
 					client.Close()
 					delete(clients, client)
+					log.SetFlags(log.LstdFlags | log.Lshortfile)
+					log.Printf("Error sending message: %v\n", err)
 				}
 			}
+		}
+	}
+}
+
+func TimerUpdate(s string) {
+	resetMSG, _ := json.Marshal("reset")
+	startMSG, _ := json.Marshal("start")
+	stopMSG, _ := json.Marshal("stop")
+
+	for client := range clients {
+		if s == "reset" {
+			err = client.WriteMessage(websocket.TextMessage, resetMSG)
+			if err != nil {
+				client.Close()
+				delete(clients, client)
+				log.SetFlags(log.LstdFlags | log.Lshortfile)
+				log.Printf("Error sending message: %v\n", err)
+			}
+		} else if s == "start" {
+			err = client.WriteMessage(websocket.TextMessage, startMSG)
+			if err != nil {
+				client.Close()
+				delete(clients, client)
+				log.SetFlags(log.LstdFlags | log.Lshortfile)
+				log.Printf("Error sending message: %v\n", err)
+			}
+		} else if s == "stop" {
+			err = client.WriteMessage(websocket.TextMessage, stopMSG)
+			if err != nil {
+				client.Close()
+				delete(clients, client)
+				log.SetFlags(log.LstdFlags | log.Lshortfile)
+				log.Printf("Error sending message: %v\n", err)
+			}
+		} else {
+			log.SetFlags(log.LstdFlags | log.Lshortfile)
+			log.Fatalf("Massive error on timer update websocket stuff: %v\n", err)
 		}
 	}
 }

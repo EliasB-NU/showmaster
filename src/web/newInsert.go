@@ -42,7 +42,6 @@ func NewInsert(w http.ResponseWriter, req *http.Request) {
 	}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
-	w.WriteHeader(http.StatusOK)
 
 	// Insert new entry into database, and tell the client to refresh
 	sql := fmt.Sprintf("INSERT INTO %s (id, name, audio, licht, pptx, notes) VALUES (%f, %s, %s, %s, %s, %s)", CFG.ProjectName, i.ID, i.Name, i.Audio, i.Licht, i.PPTX, i.Notes)
