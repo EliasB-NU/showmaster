@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  app:
+    image: braunelias/showmaster:1.0
+    restart: always
+    networks:
+      - showmaster-network
+    ports:
+      - "80:80"
+    depends_on:
+      - db
+    environment:
+      - DBUser=showmaster
+      - DBPassword=password
+      - Database=showmaster
+      - ProjectName=yourproject
+
+  db:
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=showmaster
+      - POSTGRES_PASSWORD=password
+    ports:
+      - 5432:5432
+    networks:
+      - showmaster-network
+    volumes:
+      - ./data:/var/lib/postgresql/data
+
+  #pgadmin:
+  #  image: dpage/pgadmin4:latest
+  #  environment:
+  #    - PGADMIN_DEFAULT_EMAIL=admin@example.com
+  #    - PGADMIN_DEFAULT_PASSWORD=SomeSecurePassword
+  #  ports:
+  #    - 8080:80
+
+networks:
+  showmaster-network:
+    external: false
