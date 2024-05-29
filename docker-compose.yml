@@ -1,8 +1,12 @@
-version: '3.8'
+# FOR LOCAL DEV ONLY
+# COPY THE DOCKER COMPOSE STUFF FROM THE README FOR PRODUCTION
 
 services:
   app:
-    image: braunelias/showmaster:latest
+    # image: braunelias/showmaster:latest
+    build:
+      context: .
+      dockerfile: DOCKERFILE
     restart: always
     networks:
       - showmaster-network
@@ -31,6 +35,8 @@ services:
 
   #pgadmin:
   #  image: dpage/pgadmin4:latest
+  #  netowork:
+  #    - showmaster-network
   #  environment:
   #    - PGADMIN_DEFAULT_EMAIL=admin@example.com
   #    - PGADMIN_DEFAULT_PASSWORD=SomeSecurePassword
