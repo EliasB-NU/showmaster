@@ -52,6 +52,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 duration += 1;
                 updateStopwatch();
             }, 1000);
+            startPauseBtn.textContent = "Stop";
         }
     }
 
@@ -61,6 +62,7 @@ document.addEventListener("DOMContentLoaded", () => {
             running = false;
             clearInterval(intervalId);
             intervalId = null;
+            startPauseBtn.textContent = "Start";
         }
     }
 
@@ -69,6 +71,7 @@ document.addEventListener("DOMContentLoaded", () => {
         stopStopwatch();
         duration = 0;
         updateStopwatch();
+        startPauseBtn.textContent = "Start";
     }
 
     // Initialize the stopwatch with data from the backend
@@ -79,7 +82,7 @@ document.addEventListener("DOMContentLoaded", () => {
             updateStopwatch();
             if (data.Running) {
                 startStopwatch();
-            }
+            } 
         })
         .catch(error => console.error('Error fetching stopwatch status:', error));
 
