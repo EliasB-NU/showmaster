@@ -82,6 +82,7 @@ document.addEventListener("DOMContentLoaded", () => {
             updateStopwatch();
             if (data.Running) {
                 startStopwatch();
+                startPauseBtn.textContent = "Stop"
             } 
         })
         .catch(error => console.error('Error fetching stopwatch status:', error));
