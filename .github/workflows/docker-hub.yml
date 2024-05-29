@@ -32,4 +32,4 @@ jobs:
           platforms: linux/amd64,linux/arm64
           file: ./DOCKERFILE
           push: true
-          tags: user/app:latest
+          tags: braunelias/showmaster:latest

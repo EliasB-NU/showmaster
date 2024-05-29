@@ -8,7 +8,7 @@ RUN go mod download
 
 COPY src/ ./src/
 
-RUN GOARCH=arm64 go build ./src/main.go
+RUN go build ./src/main.go
 
 FROM alpine:latest
 
