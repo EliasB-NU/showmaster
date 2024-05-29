@@ -54,6 +54,8 @@ services:
       - PGADMIN_DEFAULT_PASSWORD=SomeSecurePassword
     ports:
       - 8080:80
+    volumes:
+      - ./data:/var/lib/pgadmin/data
 
 networks:
   showmaster-network:
