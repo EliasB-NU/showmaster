@@ -25,16 +25,17 @@ func InitDB() *sql.DB {
 
 func InitalCheckup() {
 	psql := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable", CFG.DB.Username, CFG.DB.Password, CFG.DB.Host, CFG.DB.Port, CFG.DB.Database)
-	fmt.Println(psql)
 	db, err := sql.Open("postgres", psql)
 	if err != nil {
 		log.SetFlags(log.LstdFlags | log.Lshortfile)
 		log.Fatalf("Error opening Database: %v\n", err)
+		panic(err)
 	}
 	defer db.Close()
 	if err := db.Ping(); err != nil {
 		log.SetFlags(log.LstdFlags | log.Lshortfile)
-		log.Fatalf("Error connecting to database: %v\n", err)
+		log.Printf("Error connecting to database: %v\n", err)
+		return
 	}
 
 	sql := fmt.Sprintf("SELECT id FROM %s", CFG.ProjectName)
@@ -46,11 +47,6 @@ func InitalCheckup() {
 }
 
 func createTable(db *sql.DB) {
-	err := db.Ping()
-	if err != nil {
-		log.SetFlags(log.LstdFlags | log.Lshortfile)
-		log.Fatalf("Error connecting to database: %v\n", err)
-	}
 	log.Println("Creating table ...")
 	execSQL := fmt.Sprintf(`
 	CREATE TABLE IF NOT EXISTS %s (
@@ -61,7 +57,7 @@ func createTable(db *sql.DB) {
     	pptx text,
     	notes text
 	)`, CFG.ProjectName)
-	_, err = db.Exec(execSQL)
+	_, err := db.Exec(execSQL)
 	if err != nil {
 		log.SetFlags(log.LstdFlags | log.Lshortfile)
 		log.Fatalf("Error creating table: %v\n", err)

@@ -30,11 +30,11 @@ var (
 type Message struct {
 	Rows struct {
 		ID    float32 `json:"id"`
-		Name  string  `json:"name"`
-		Audio string  `json:"audio"`
-		Licht string  `json:"licht"`
-		PPTX  string  `json:"pptx"`
-		Notes string  `json:"notes"`
+		Name  *string `json:"name"`
+		Audio *string `json:"audio"`
+		Licht *string `json:"licht"`
+		PPTX  *string `json:"pptx"`
+		Notes *string `json:"notes"`
 	} `json:"row"`
 	Highlighted bool `json:"highlighted"`
 }
@@ -63,6 +63,7 @@ func SendAllRows(ws *websocket.Conn) {
 	sql := fmt.Sprintf("SELECT id, name, audio, licht, pptx, notes FROM %s", CFG.ProjectName)
 	rows, err := db.Query(sql)
 	if err != nil {
+		log.SetFlags(log.LstdFlags | log.Lshortfile)
 		log.Printf("Error fetching rows: %v\n", err)
 		return
 	}
@@ -73,6 +74,7 @@ func SendAllRows(ws *websocket.Conn) {
 	for rows.Next() {
 		var msg Message
 		if err := rows.Scan(&msg.Rows.ID, &msg.Rows.Name, &msg.Rows.Audio, &msg.Rows.Licht, &msg.Rows.PPTX, &msg.Rows.Notes); err != nil {
+			log.SetFlags(log.LstdFlags | log.Lshortfile)
 			log.Printf("Error scanning row: %v\n", err)
 			continue
 		}
@@ -82,6 +84,7 @@ func SendAllRows(ws *websocket.Conn) {
 		completeMSG = append(completeMSG, msg)
 	}
 	if err := rows.Err(); err != nil {
+		log.SetFlags(log.LstdFlags | log.Lshortfile)
 		log.Printf("Error iterating over rows: %v\n", err)
 		return
 	}
@@ -89,12 +92,14 @@ func SendAllRows(ws *websocket.Conn) {
 	// Convert the rows and highlighted row ID to JSON
 	jsonData, err := json.Marshal(completeMSG)
 	if err != nil {
+		log.SetFlags(log.LstdFlags | log.Lshortfile)
 		log.Printf("Error marshalling JSON: %v\n", err)
 		return
 	}
 
 	// Send JSON data to the client
 	if err := ws.WriteMessage(websocket.TextMessage, jsonData); err != nil {
+		log.SetFlags(log.LstdFlags | log.Lshortfile)
 		log.Printf("Error writing JSON data to client: %v\n", err)
 		return
 	}
@@ -102,11 +107,7 @@ func SendAllRows(ws *websocket.Conn) {
 
 func AutoUpdate() {
 	var previousRow float32 = -1
-	jsonData, err := json.Marshal(refreshMSG)
-	if err != nil {
-		log.Printf("Error marshalling JSON: %v\n", err)
-		return
-	}
+	jsonData, _ := json.Marshal(refreshMSG)
 	for {
 		// Send the new highlighted row to all connected clients
 		if previousRow != HighlightedRowID || Update {
