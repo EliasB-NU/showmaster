@@ -6,6 +6,11 @@ on:
 
   workflow_dispatch:
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
 jobs:
   docker:
     runs-on: ubuntu-latest
@@ -25,11 +30,19 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
       
+      - name: Extract metadata (tags, labels) for Docker
+        uses: docker/metadata-action@v5
+        id: meta
+        with:
+          images: braunelias/showmaster
+      
       - name: Build and push
         uses: docker/build-push-action@v5
+        id: push
         with:
           context: .
           platforms: linux/amd64,linux/arm64
           file: ./DOCKERFILE
           push: true
-          tags: braunelias/showmaster:latest
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}    
