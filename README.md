@@ -9,7 +9,7 @@ The currently highlighted row is synced with every device.
 To add data to showmaster, you need to use an database tool like Jetbrains DataGrip or pqAdmin, maybe I will create an admin panel in the future. 
 
 ## Showcase
-<video src="https://github.com/EliasB-NU/showmaster/blob/6f8dbd60e7673b87587b71697dd8db1166f50458/media/showcase.mp4?raw=true" controls></video>
+![Watch the video]([https://youtu.be/vt5fpE0bzSY](https://github.com/EliasB-NU/showmaster/blob/6f8dbd60e7673b87587b71697dd8db1166f50458/media/showcase.mp4?raw=true))
 
 ## Setup
 Just copy the contents of the "docker compose" file to your local machine, I assume you have docker & docker compose installed, and run it. On the mainpage you can create and select projects.  
