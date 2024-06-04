@@ -35,20 +35,19 @@ func GetConfig() *CFG {
 	return &c
 }
 
-/* Enable for local testing without docker container
-func GetConfig() *CFG {
-	const file = "config/config.json"
-	var config CFG
+// Enable for local testing without docker container
+// func GetConfig() *CFG {
+// 	const file = "config/config.json"
+// 	var config CFG
 
-	cfgfile, err := os.Open(file)
-	if err != nil {
-		log.SetFlags(log.LstdFlags | log.Lshortfile)
-		log.Fatalf("Error readeing config file: %d\n", err)
-	}
+// 	cfgfile, err := os.Open(file)
+// 	if err != nil {
+// 		log.SetFlags(log.LstdFlags | log.Lshortfile)
+// 		log.Fatalf("Error readeing config file: %d\n", err)
+// 	}
 
-	jsonParser := json.NewDecoder(cfgfile)
-	jsonParser.Decode(&config)
+// 	jsonParser := json.NewDecoder(cfgfile)
+// 	jsonParser.Decode(&config)
 
-	return &config
-}
-*/
+// 	return &config
+// }

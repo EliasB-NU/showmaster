@@ -17,6 +17,7 @@ var (
 
 	CFG    config.CFG = *config.GetConfig()
 	server            = fmt.Sprintf("%s:%d", CFG.Website.Host, CFG.Website.Port)
+	tables []string   = database.GetTables()
 
 	mux = http.NewServeMux()
 	c   = cors.New(cors.Options{
@@ -27,25 +28,33 @@ var (
 	})
 )
 
+func HandleFavicon(w http.ResponseWriter, req *http.Request) {
+	http.ServeFile(w, req, "./public/favicon.ico")
+}
+
 func main() {
 	database.InitalCheckup()
 
-	// Serve Websites
-	mux.Handle("/", http.FileServer(http.Dir("./public")))
+	for _, table := range tables {
+		// Serve Websites
+		var urlSubfix string = fmt.Sprintf("/%s/", table)
+		mux.Handle(urlSubfix, http.StripPrefix(urlSubfix, http.FileServer(http.Dir("./public/rowSite"))))
+		// Handle WebSocket connections
+		mux.HandleFunc(fmt.Sprintf("/ws%s", urlSubfix), web.HandleConnections)
 
-	// Handle WebSocket connections
-	mux.HandleFunc("/ws", web.HandleConnections)
-	go web.AutoUpdate()
+		// Entries
+		mux.HandleFunc(fmt.Sprintf("/api/highlightedrow%s", urlSubfix), web.GetHighlightedRow)
+		mux.HandleFunc(fmt.Sprintf("/api/data%s", urlSubfix), web.HandleData)
+		//mux.HandleFunc(fmt.Sprintf("/api/newinsert%s", urlSubfix), web.NewInsert)
+
+		// Timer
+		mux.HandleFunc(fmt.Sprintf("/api/stopwatch-update%s", urlSubfix), web.ButtonUpdate)
+		mux.HandleFunc(fmt.Sprintf("/api/stopwatch-status%s", urlSubfix), web.GetCurrentTime)
+	}
 	defer web.WS.Close()
 
-	// Entries
-	mux.HandleFunc("/api/highlightedrow", web.GetHighlightedRow)
-	mux.HandleFunc("/api/data", web.HandleData)
-	mux.HandleFunc("/api/newinsert", web.NewInsert)
-
-	// Timer
-	mux.HandleFunc("/api/stopwatch-update", web.ButtonUpdate)
-	mux.HandleFunc("/api/stopwatch-status", web.GetCurrentTime)
+	// Favicon
+	mux.HandleFunc("/", HandleFavicon)
 
 	// Cors
 	handler := c.Handler(mux)

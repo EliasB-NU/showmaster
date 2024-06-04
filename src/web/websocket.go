@@ -6,40 +6,17 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"showmaster/src/config"
 	"showmaster/src/database"
+	"strings"
 
 	"github.com/gorilla/websocket"
 )
 
-var (
-	WS       *websocket.Conn
-	clients  = make(map[*websocket.Conn]bool)
-	upgrader = websocket.Upgrader{
-		CheckOrigin: func(r *http.Request) bool {
-			return true
-		},
-	}
-
-	refreshMSG       string     = "refresh"
-	CFG              config.CFG = *config.GetConfig()
-	HighlightedRowID float32    = -1
-	Update           bool       = false
-)
-
-type Message struct {
-	Rows struct {
-		ID    float32 `json:"id"`
-		Name  *string `json:"name"`
-		Audio *string `json:"audio"`
-		Licht *string `json:"licht"`
-		PPTX  *string `json:"pptx"`
-		Notes *string `json:"notes"`
-	} `json:"row"`
-	Highlighted bool `json:"highlighted"`
-}
-
 func HandleConnections(w http.ResponseWriter, r *http.Request) {
+	var (
+		firstPart, _ = strings.CutPrefix(r.RequestURI, "/ws/")
+		rURL, _      = strings.CutSuffix(firstPart, "/")
+	)
 	// Upgrade initial GET request to a WebSocket
 	WS, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
@@ -52,15 +29,15 @@ func HandleConnections(w http.ResponseWriter, r *http.Request) {
 	clients[WS] = true
 
 	// Send all rows
-	SendAllRows(WS)
+	SendAllRows(WS, rURL)
 }
 
 // Update the sendAllRows function to include the highlighted row ID
-func SendAllRows(ws *websocket.Conn) {
+func SendAllRows(ws *websocket.Conn, rURL string) {
 	// Fetch all rows from the database
 	var db sql.DB = *database.InitDB()
 	defer db.Close()
-	sql := fmt.Sprintf("SELECT id, name, audio, licht, pptx, notes FROM %s", CFG.ProjectName)
+	sql := fmt.Sprintf("SELECT id, name, audio, licht, pptx, notes FROM %s", rURL)
 	rows, err := db.Query(sql)
 	if err != nil {
 		log.SetFlags(log.LstdFlags | log.Lshortfile)
@@ -78,8 +55,12 @@ func SendAllRows(ws *websocket.Conn) {
 			log.Printf("Error scanning row: %v\n", err)
 			continue
 		}
-		if msg.Rows.ID == HighlightedRowID {
-			msg.Highlighted = true
+		for id := range HighlightedRows {
+			if HighlightedRows[id].Table == rURL {
+				if msg.Rows.ID == HighlightedRows[id].Row {
+					msg.Highlighted = true
+				}
+			}
 		}
 		completeMSG = append(completeMSG, msg)
 	}
@@ -105,34 +86,29 @@ func SendAllRows(ws *websocket.Conn) {
 	}
 }
 
-func AutoUpdate() {
-	var previousRow float32 = -1
+func SendUpdateMessage() {
 	jsonData, _ := json.Marshal(refreshMSG)
-	for {
-		// Send the new highlighted row to all connected clients
-		if previousRow != HighlightedRowID || Update {
-			previousRow = HighlightedRowID
-			Update = false
-			for client := range clients {
-				err = client.WriteMessage(websocket.TextMessage, jsonData)
-				if err != nil {
-					client.Close()
-					delete(clients, client)
-					log.SetFlags(log.LstdFlags | log.Lshortfile)
-					log.Printf("Error sending message: %v\n", err)
-				}
-			}
+	// Send the new highlighted row to all connected clients
+	for client := range clients {
+		err = client.WriteMessage(websocket.TextMessage, jsonData)
+		if err != nil {
+			client.Close()
+			delete(clients, client)
+			log.SetFlags(log.LstdFlags | log.Lshortfile)
+			log.Printf("Error sending message: %v\n", err)
 		}
 	}
 }
 
-func TimerUpdate(s string) {
-	resetMSG, _ := json.Marshal("reset")
-	startMSG, _ := json.Marshal("start")
-	stopMSG, _ := json.Marshal("stop")
+func TimerUpdate(s string, rURL string) {
+	var (
+		resetMSG, _ = json.Marshal(s)
+		startMSG, _ = json.Marshal(s)
+		stopMSG, _  = json.Marshal(s)
+	)
 
 	for client := range clients {
-		if s == "reset" {
+		if s == "reset+"+rURL {
 			err = client.WriteMessage(websocket.TextMessage, resetMSG)
 			if err != nil {
 				client.Close()
@@ -140,7 +116,7 @@ func TimerUpdate(s string) {
 				log.SetFlags(log.LstdFlags | log.Lshortfile)
 				log.Printf("Error sending message: %v\n", err)
 			}
-		} else if s == "start" {
+		} else if s == "start+"+rURL {
 			err = client.WriteMessage(websocket.TextMessage, startMSG)
 			if err != nil {
 				client.Close()
@@ -148,7 +124,7 @@ func TimerUpdate(s string) {
 				log.SetFlags(log.LstdFlags | log.Lshortfile)
 				log.Printf("Error sending message: %v\n", err)
 			}
-		} else if s == "stop" {
+		} else if s == "stop+"+rURL {
 			err = client.WriteMessage(websocket.TextMessage, stopMSG)
 			if err != nil {
 				client.Close()
@@ -161,4 +137,17 @@ func TimerUpdate(s string) {
 			log.Fatalf("Massive error on timer update websocket stuff: %v\n", err)
 		}
 	}
+}
+
+func initHighlightedRows() []HighlightedRow {
+	var hr []HighlightedRow
+	for _, table := range Tables {
+		h := HighlightedRow{
+			Row:   -1,
+			Table: table,
+			Watch: *NewStopwatch(),
+		}
+		hr = append(hr, h)
+	}
+	return hr
 }

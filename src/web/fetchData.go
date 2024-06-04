@@ -7,17 +7,23 @@ import (
 	"log"
 	"net/http"
 	"showmaster/src/database"
+	"strings"
 )
 
 func HandleData(w http.ResponseWriter, r *http.Request) {
-	// Fetch all rows from the database
-	var db sql.DB = *database.InitDB()
+	var (
+		firstPart, _        = strings.CutPrefix(r.RequestURI, "/api/data/")
+		rURL, _             = strings.CutSuffix(firstPart, "/")
+		db           sql.DB = *database.InitDB()
+	)
 	defer db.Close()
-	sql := fmt.Sprintf("SELECT id, name, audio, licht, pptx, notes FROM %s", CFG.ProjectName)
+
+	// Fetch all rows from the database
+	sql := fmt.Sprintf("SELECT id, name, audio, licht, pptx, notes FROM %s", rURL)
 	rows, err := db.Query(sql)
 	if err != nil {
 		log.SetFlags(log.LstdFlags | log.Lshortfile)
-		log.Printf("Error fetching rows: %v", err)
+		log.Printf("Error fetching rows: %v\n", err)
 		return
 	}
 	defer rows.Close()
@@ -27,11 +33,16 @@ func HandleData(w http.ResponseWriter, r *http.Request) {
 	for rows.Next() {
 		var msg Message
 		if err := rows.Scan(&msg.Rows.ID, &msg.Rows.Name, &msg.Rows.Audio, &msg.Rows.Licht, &msg.Rows.PPTX, &msg.Rows.Notes); err != nil {
+			log.SetFlags(log.LstdFlags | log.Lshortfile)
 			log.Printf("Error scanning row: %v\n", err)
 			continue
 		}
-		if msg.Rows.ID == HighlightedRowID {
-			msg.Highlighted = true
+		for id := range HighlightedRows {
+			if HighlightedRows[id].Table == rURL {
+				if msg.Rows.ID == HighlightedRows[id].Row {
+					msg.Highlighted = true
+				}
+			}
 		}
 		completeMSG = append(completeMSG, msg)
 	}
@@ -49,4 +60,8 @@ func HandleData(w http.ResponseWriter, r *http.Request) {
 
 	// Write JSON response
 	w.Write(jsonData)
+}
+
+func HandleTables(w http.ResponseWriter, req *http.Request) {
+
 }

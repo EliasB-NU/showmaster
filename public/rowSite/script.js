@@ -1,6 +1,20 @@
 // script.js
+function extractSubpath(url) {
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    return anchor.pathname;
+}
+const currentURL = window.location.href;
+const subpath = extractSubpath(currentURL);
+const withoutfirstletter = subpath.slice(1);
+const cleanURL = withoutfirstletter.substring(0, withoutfirstletter.length-1);
+console.log(cleanURL);
+
 document.addEventListener("DOMContentLoaded", () => {
-    const ws = new WebSocket('/ws');
+    const headlineElement = document.getElementById('headline');
+    headlineElement.textContent = 'ShowMaster - V1.1 |  '+cleanURL;
+
+    const ws = new WebSocket('/ws'+subpath);
 
     ws.onopen = function(event) {
         console.log('WebSocket connection established.');
@@ -11,11 +25,11 @@ document.addEventListener("DOMContentLoaded", () => {
         const msgs = JSON.parse(event.data);
         if (msgs === "refresh") {
             fetchData();
-        } else if (msgs === "reset") {
+        } else if (msgs === "reset+"+cleanURL) {
             resetStopwatch();
-        } else if (msgs === "start") {
+        } else if (msgs === "start+"+cleanURL) {
             startStopwatch();
-        } else if (msgs === "stop") {
+        } else if (msgs === "stop+"+cleanURL) {
             stopStopwatch();
             onStopUpdate();
         } else {
@@ -75,7 +89,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Initialize the stopwatch with data from the backend
-    fetch('/api/stopwatch-status')
+    fetch('/api/stopwatch-status'+subpath)
         .then(response => response.json())
         .then(data => {
             duration = data.Duration;
@@ -88,7 +102,7 @@ document.addEventListener("DOMContentLoaded", () => {
         .catch(error => console.error('Error fetching stopwatch status:', error));
 
     function onStopUpdate() {
-        fetch('/api/stopwatch-status')
+        fetch('/api/stopwatch-status'+subpath)
         .then(response => response.json())
         .then(data => {
             duration = data.Duration;
@@ -108,7 +122,7 @@ document.addEventListener("DOMContentLoaded", () => {
             };
     
             // Make the POST request
-            fetch('/api/stopwatch-update', {
+            fetch('/api/stopwatch-update'+subpath, {
                method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -135,7 +149,7 @@ document.addEventListener("DOMContentLoaded", () => {
             };
     
             // Make the POST request
-            fetch('/api/stopwatch-update', {
+            fetch('/api/stopwatch-update'+subpath, {
                method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -165,7 +179,7 @@ document.addEventListener("DOMContentLoaded", () => {
         };
 
         // Make the POST request
-        fetch('/api/stopwatch-update', {
+        fetch('/api/stopwatch-update'+subpath, {
            method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -247,7 +261,7 @@ document.addEventListener("DOMContentLoaded", () => {
         };
 
         // Make the POST request
-        fetch('/api/highlightedrow', {
+        fetch('/api/highlightedrow'+subpath, {
            method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -269,7 +283,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function fetchData() {
-        fetch('/api/data')
+        fetch('/api/data'+subpath)
         .then(response => response.json())
         .then(data => {
             displayRows(data);
