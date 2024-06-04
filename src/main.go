@@ -28,14 +28,10 @@ var (
 	})
 )
 
-func HandleFavicon(w http.ResponseWriter, req *http.Request) {
-	http.ServeFile(w, req, "./public/favicon.ico")
-}
-
 func main() {
 	database.InitalCheckup()
 
-	for _, table := range tables {
+	for _, table := range tables { // For prject site
 		// Serve Websites
 		var urlSubfix string = fmt.Sprintf("/%s/", table)
 		mux.Handle(urlSubfix, http.StripPrefix(urlSubfix, http.FileServer(http.Dir("./public/rowSite"))))
@@ -53,8 +49,9 @@ func main() {
 	}
 	defer web.WS.Close()
 
-	// Favicon
-	mux.HandleFunc("/", HandleFavicon)
+	// For project select side
+	mux.Handle("/", http.FileServer(http.Dir("./public/projectSite")))
+	mux.HandleFunc("/api/gettables", web.HandleTables)
 
 	// Cors
 	handler := c.Handler(mux)

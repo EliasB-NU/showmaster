@@ -54,6 +54,7 @@ func HandleData(w http.ResponseWriter, r *http.Request) {
 	// Convert the rows and highlighted row ID to JSON
 	jsonData, err := json.Marshal(completeMSG)
 	if err != nil {
+		log.SetFlags(log.LstdFlags | log.Lshortfile)
 		log.Printf("Error marshalling JSON: %v\n", err)
 		return
 	}
@@ -63,5 +64,19 @@ func HandleData(w http.ResponseWriter, r *http.Request) {
 }
 
 func HandleTables(w http.ResponseWriter, req *http.Request) {
+	var completeMSG []TablesData
+	for i := 0; i < len(Tables); i++ {
+		zwischenAaal := TablesData{
+			Table: Tables[i],
+		}
+		completeMSG = append(completeMSG, zwischenAaal)
+	}
+	jsonData, err := json.Marshal(completeMSG)
+	if err != nil {
+		log.SetFlags(log.LstdFlags | log.Lshortfile)
+		log.Printf("Error marshalling JSON: %v\n", err)
+		return
+	}
 
+	w.Write(jsonData)
 }
