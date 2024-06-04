@@ -1,4 +1,4 @@
-# ShowMaster - V1
+# ShowMaster - V2
 
 This is an cross platform/browser synced list of scenes for your local event.  
   
