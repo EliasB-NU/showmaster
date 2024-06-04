@@ -11,9 +11,9 @@ func GetHighlightedRow(w http.ResponseWriter, r *http.Request) {
 	var (
 		firstPart, _ = strings.CutPrefix(r.RequestURI, "/api/highlightedrow/")
 		rURL, _      = strings.CutSuffix(firstPart, "/")
+		data         NumberData
 	)
 	// Decode the JSON request body
-	var data NumberData
 	if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return

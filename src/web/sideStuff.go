@@ -1,11 +1,13 @@
 package web
 
 import (
+	"fmt"
 	"net/http"
 	"showmaster/src/config"
 	"showmaster/src/database"
 
 	"github.com/gorilla/websocket"
+	"github.com/rs/cors"
 )
 
 var ( // All cross Project needed vars
@@ -19,10 +21,18 @@ var ( // All cross Project needed vars
 	}
 
 	// Web stuff
-	refreshMSG      string           = "refresh"
-	Tables          []string         = database.GetTables()
-	CFG             config.CFG       = *config.GetConfig()
-	HighlightedRows []HighlightedRow = initHighlightedRows()
+	refreshMSG      string           = "refresh"             // Some overengeniered msg
+	CFG             config.CFG       = *config.GetConfig()   // The Config
+	HighlightedRows []HighlightedRow = initHighlightedRows() // To get all tables with their proberties
+
+	server = fmt.Sprintf("%s:%d", CFG.Website.Host, CFG.Website.Port) // Host & Port
+	mux    = http.NewServeMux()                                       // Mux server
+	c      = cors.New(cors.Options{                                   // Cors Policy
+		AllowedOrigins:       []string{"*"},
+		AllowedMethods:       []string{"GET", "POST"},
+		AllowPrivateNetwork:  true,
+		OptionsSuccessStatus: 200,
+	})
 
 	// Stopwatch Stuff
 	bu bUpdate
@@ -63,6 +73,27 @@ type NumberData struct { // Highlightedrow incoming update message
 	Number float32 `json:"number"`
 }
 
-type TablesData struct {
+type TablesData struct { // All tables outgoing message
 	Table string `json:"table"`
+}
+
+type NewTableData struct { // New table incoming message
+	Name string `json:"name"`
+}
+
+func initHighlightedRows() []HighlightedRow {
+	var (
+		hr     []HighlightedRow
+		tables []string = database.GetTables()
+	)
+
+	for _, table := range tables {
+		h := HighlightedRow{
+			Row:   -1,
+			Table: table,
+			Watch: *NewStopwatch(),
+		}
+		hr = append(hr, h)
+	}
+	return hr
 }

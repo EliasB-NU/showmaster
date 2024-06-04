@@ -12,7 +12,7 @@ console.log(cleanURL);
 
 document.addEventListener("DOMContentLoaded", () => {
     const headlineElement = document.getElementById('headline');
-    headlineElement.textContent = 'ShowMaster - V1.1 |  '+cleanURL;
+    headlineElement.textContent = 'ShowMaster - V2 |  '+cleanURL;
 
     const ws = new WebSocket('/ws'+subpath);
 

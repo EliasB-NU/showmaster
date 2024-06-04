@@ -8,8 +8,10 @@ The currently highlighted row is synced with every device.
 
 To add data to showmaster, you need to use an database tool like Jetbrains DataGrip or pqAdmin, maybe I will create an admin panel in the future. 
 
+## Example
+
 ## Setup
-Just copy the contents of the "docker compose" file to your local machine, I assume you have docker & docker compose installed, and run it. By changing the project name and restarting, the showmaster programm creates a new table, so you can easily switch between projects.  
+Just copy the contents of the "docker compose" file to your local machine, I assume you have docker & docker compose installed, and run it. On the mainpage you can create and select projects.  
 To easily add data, I included a pgadmin4 service, you can include it, to get an fast and easy option to view and edit the database in the web.
 
 Example Docker Compose File:
@@ -30,7 +32,6 @@ services:
       - DBUser=showmaster
       - DBPassword=password
       - Database=showmaster
-      - ProjectName=yourproject
 
   db:
     image: postgres:16-alpine

@@ -138,16 +138,3 @@ func TimerUpdate(s string, rURL string) {
 		}
 	}
 }
-
-func initHighlightedRows() []HighlightedRow {
-	var hr []HighlightedRow
-	for _, table := range Tables {
-		h := HighlightedRow{
-			Row:   -1,
-			Table: table,
-			Watch: *NewStopwatch(),
-		}
-		hr = append(hr, h)
-	}
-	return hr
-}

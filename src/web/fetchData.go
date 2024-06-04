@@ -64,10 +64,13 @@ func HandleData(w http.ResponseWriter, r *http.Request) {
 }
 
 func HandleTables(w http.ResponseWriter, req *http.Request) {
-	var completeMSG []TablesData
-	for i := 0; i < len(Tables); i++ {
+	var (
+		tables      []string = database.GetTables()
+		completeMSG []TablesData
+	)
+	for i := 0; i < len(tables); i++ {
 		zwischenAaal := TablesData{
-			Table: Tables[i],
+			Table: tables[i],
 		}
 		completeMSG = append(completeMSG, zwischenAaal)
 	}
