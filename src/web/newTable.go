@@ -22,4 +22,12 @@ func NewTable(w http.ResponseWriter, req *http.Request) {
 	database.CreateTable(data.Name)
 
 	InitiateNewSite(data.Name)
+
+	hr := HighlightedRow{
+		Row:   -1,
+		Table: data.Name,
+		Watch: *NewStopwatch(),
+	}
+
+	HighlightedRows = append(HighlightedRows, hr)
 }

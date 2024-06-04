@@ -60,7 +60,11 @@ func InitDB() *sql.DB {
 func main() {
 	db := InitDB()
 	for i := 1; i < 500; i++ {
-		sql := fmt.Sprintf("INSERT INTO test (id, name, audio, licht, pptx, notes) VALUES (%d, 'ncihts', 'nichts', 'nichts', 'nichts', 'nichts');", i)
-		db.Exec(sql)
+		sql := fmt.Sprintf("INSERT INTO %s (id, name, audio, licht, pptx, notes) VALUES (%d, 'the name', 'your audio changes', 'maybe some lightning', 'do you have video stuff?', 'maybe someone has to move some probs');", "secondaryproject", i)
+		_, err := db.Exec(sql)
+		if err != nil {
+			panic(err)
+		}
 	}
+	defer db.Close()
 }

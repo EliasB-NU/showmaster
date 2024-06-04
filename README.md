@@ -8,7 +8,8 @@ The currently highlighted row is synced with every device.
 
 To add data to showmaster, you need to use an database tool like Jetbrains DataGrip or pqAdmin, maybe I will create an admin panel in the future. 
 
-## Example
+## Showcase
+<video src="./media/showcase.mp4" controls></video>
 
 ## Setup
 Just copy the contents of the "docker compose" file to your local machine, I assume you have docker & docker compose installed, and run it. On the mainpage you can create and select projects.  
