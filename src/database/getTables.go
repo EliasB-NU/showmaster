@@ -15,7 +15,7 @@ func GetTables() []string {
 	query := `
 	SELECT table_name 
 	FROM information_schema.tables 
-	WHERE table_schema = 'public'
+	WHERE table_schema = 'showmaster'
 	`
 
 	rows, err := db.Query(query)

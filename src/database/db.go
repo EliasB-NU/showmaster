@@ -37,6 +37,7 @@ func InitalCheckup() {
 		log.Printf("Error connecting to database: %v\n", err)
 		return
 	}
+	db.Exec("CREATE SCHEMA showmaster;")
 }
 
 func CreateTable(table string) {
@@ -51,7 +52,8 @@ func CreateTable(table string) {
 
 	log.Printf("Creating table %s\n", table)
 	execSQL := fmt.Sprintf(`
-	CREATE TABLE IF NOT EXISTS %s (
+	CREATE TABLE IF NOT EXISTS showmaster.%s (
+		identifier SERIAL PRIMARY KEY,
 		id double precision,
 		name text,
 		audio text,
