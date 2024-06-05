@@ -1,6 +1,8 @@
 package config
 
 import (
+	"encoding/json"
+	"log"
 	"os"
 )
 
@@ -22,33 +24,34 @@ type CFG struct {
 }
 
 func GetConfig() *CFG {
-	var c CFG
-	c.DB.Host = "db"
-	c.DB.Port = 5432
-	c.DB.Username = os.Getenv("DBUser")
-	c.DB.Password = os.Getenv("DBPassword")
-	c.DB.Database = os.Getenv("Database")
-	c.Website.Host = "0.0.0.0"
-	c.Website.Port = 80
-	c.ProjectName = os.Getenv("ProjectName")
+	if os.Args[1] == "prod" {
+		var c CFG
+		c.DB.Host = "db"
+		c.DB.Port = 5432
+		c.DB.Username = os.Getenv("DBUser")
+		c.DB.Password = os.Getenv("DBPassword")
+		c.DB.Database = os.Getenv("Database")
+		c.Website.Host = "0.0.0.0"
+		c.Website.Port = 80
+		c.ProjectName = os.Getenv("ProjectName")
 
-	return &c
+		return &c
+	} else if os.Args[1] == "dev" {
+		const file = "config/config.json"
+		var config CFG
+
+		cfgfile, err := os.Open(file)
+		if err != nil {
+			log.SetFlags(log.LstdFlags | log.Lshortfile)
+			log.Fatalf("Error readeing config file: %d\n", err)
+		}
+
+		jsonParser := json.NewDecoder(cfgfile)
+		jsonParser.Decode(&config)
+
+		return &config
+	} else {
+		panic("Error: Wrong command line argument")
+		return nil
+	}
 }
-
-// Enable for local testing without docker container
-
-// func GetConfig() *CFG {
-// 	const file = "config/config.json"
-// 	var config CFG
-
-// 	cfgfile, err := os.Open(file)
-// 	if err != nil {
-// 		log.SetFlags(log.LstdFlags | log.Lshortfile)
-// 		log.Fatalf("Error readeing config file: %d\n", err)
-// 	}
-
-// 	jsonParser := json.NewDecoder(cfgfile)
-// 	jsonParser.Decode(&config)
-
-// 	return &config
-// }

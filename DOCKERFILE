@@ -22,4 +22,4 @@ COPY public/ ./public/
 
 EXPOSE 80
 
-CMD ["./main"]
+CMD ["./main prod"]
