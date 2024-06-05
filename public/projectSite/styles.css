@@ -55,8 +55,19 @@ footer {
     margin-top: 80px;
 }
 
-#dataForm {
-    margin-bottom: 35px;
+#tableForm {
+    margin-bottom: 5%;
+    position: fixed;
+    bottom: 10px;
+    left: 10px;
+    background-color: white;
+    padding: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+}
+
+#newInsert {
+    margin-bottom: 2%;    
     position: fixed;
     bottom: 10px;
     left: 10px;

@@ -10,6 +10,8 @@ import (
 	"github.com/rs/cors"
 )
 
+// All important vars
+
 var ( // All cross Project needed vars
 	// Websocket stuff
 	WS       *websocket.Conn
@@ -40,6 +42,8 @@ var ( // All cross Project needed vars
 	// Random stuff
 	err error
 )
+
+// Structs
 
 type HighlightedRow struct { // Struct for all sites, internal use
 	Row   float32
@@ -80,6 +84,18 @@ type TablesData struct { // All tables outgoing message
 type NewTableData struct { // New table incoming message
 	Name string `json:"name"`
 }
+
+type insert struct { // New insert into a table, incoming message
+	Table string  `json:"table"`
+	ID    float32 `json:"id"`
+	Name  string  `json:"name"`
+	Audio string  `json:"audio"`
+	Licht string  `json:"licht"`
+	PPTX  string  `json:"pptx"`
+	Notes string  `json:"notes"`
+}
+
+// Side Functions
 
 func initHighlightedRows() []HighlightedRow {
 	var (

@@ -20,7 +20,6 @@ func InitiateWeb() {
 		// Entries
 		mux.HandleFunc(fmt.Sprintf("/api/highlightedrow%s", urlSubfix), GetHighlightedRow) // New Highlightedrow
 		mux.HandleFunc(fmt.Sprintf("/api/data%s", urlSubfix), HandleData)                  // get all rows
-		// mux.HandleFunc(fmt.Sprintf("/api/newinsert%s", urlSubfix), web.NewInsert)           // new insert W.I.P.
 
 		// Timer
 		mux.HandleFunc(fmt.Sprintf("/api/stopwatch-update%s", urlSubfix), ButtonUpdate)   // Timer button update
@@ -31,6 +30,7 @@ func InitiateWeb() {
 	mux.Handle("/", http.FileServer(http.Dir("./public/projectSite"))) // Website
 	mux.HandleFunc("/api/gettables", HandleTables)                     // Get all Tables
 	mux.HandleFunc("/api/newtable", NewTable)                          // Create new table
+	mux.HandleFunc("/api/newinsert", NewInsert)                        // New insert
 
 	// Cors
 	handler := c.Handler(mux)
