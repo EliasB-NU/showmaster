@@ -65,13 +65,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
         console.log(id);
             
-        fetch('/api/newinsert', {
+        fetch('/api/newinsert:'+table, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                table: table,
                 id: id,
                 name: name,
                 audio: audio,

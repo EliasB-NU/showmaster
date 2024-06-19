@@ -1,4 +1,4 @@
-package web
+package util
 
 import (
 	"sync"
@@ -8,7 +8,7 @@ import (
 type Stopwatch struct {
 	startTime   time.Time
 	accumulated time.Duration
-	running     bool
+	Running     bool
 	mutex       sync.Mutex
 }
 
@@ -19,9 +19,9 @@ func NewStopwatch() *Stopwatch {
 func (s *Stopwatch) Start() {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
-	if !s.running {
+	if !s.Running {
 		s.startTime = time.Now()
-		s.running = true
+		s.Running = true
 		go s.runTimer()
 	}
 }
@@ -29,9 +29,9 @@ func (s *Stopwatch) Start() {
 func (s *Stopwatch) Stop() time.Duration {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
-	if s.running {
+	if s.Running {
 		s.accumulated += time.Since(s.startTime)
-		s.running = false
+		s.Running = false
 	}
 	return s.accumulated
 }
@@ -39,9 +39,9 @@ func (s *Stopwatch) Stop() time.Duration {
 func (s *Stopwatch) Resume() {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
-	if !s.running {
+	if !s.Running {
 		s.startTime = time.Now()
-		s.running = true
+		s.Running = true
 		go s.runTimer()
 	}
 }
@@ -49,14 +49,14 @@ func (s *Stopwatch) Resume() {
 func (s *Stopwatch) Reset() {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
-	s.running = false
+	s.Running = false
 	s.accumulated = 0
 }
 
 func (s *Stopwatch) ElapsedSeconds() float64 {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
-	if s.running {
+	if s.Running {
 		return s.accumulated.Seconds() + time.Since(s.startTime).Seconds()
 	}
 	return s.accumulated.Seconds()
@@ -68,7 +68,7 @@ func (s *Stopwatch) runTimer() {
 
 	for range ticker.C {
 		s.mutex.Lock()
-		if !s.running {
+		if !s.Running {
 			s.mutex.Unlock()
 			return
 		}
