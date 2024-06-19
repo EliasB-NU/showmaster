@@ -8,7 +8,7 @@ import (
 func GetTables() []string {
 	var (
 		err error
-		db  sql.DB = *InitDB()
+		db  sql.DB = *GetDB()
 	)
 	defer db.Close()
 

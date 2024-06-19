@@ -8,6 +8,7 @@ import (
 func main() {
 	database.InitalCheckup()
 
-	web.InitiateWeb()
-	defer web.WS.Close() // Close the websocket
+	web.SetLogLevel()           // Log level
+	go web.CheckForNewRowSite() // because of import cycle problem, periodic check if there is a new table
+	web.StartTheWeb()           // Inits all the api endpoints and sites
 }
