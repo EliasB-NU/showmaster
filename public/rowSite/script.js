@@ -23,13 +23,13 @@ document.addEventListener("DOMContentLoaded", () => {
     ws.onmessage = function(event) {
         console.log(event.data);
         const msgs = JSON.parse(event.data);
-        if (msgs === cleanURL+":refresh") {
+        if (msgs === cleanURL+':refresh') {
             fetchData();
-        } else if (msgs === cleanURL+":reset") {
+        } else if (msgs === cleanURL+':reset') {
             resetStopwatch();
-        } else if (msgs === cleanURL+":start") {
+        } else if (msgs === cleanURL+':start') {
             startStopwatch();
-        } else if (msgs === cleanURL+":stop") {
+        } else if (msgs === cleanURL+':stop') {
             stopStopwatch();
             onStopUpdate();
         }    
@@ -114,8 +114,7 @@ document.addEventListener("DOMContentLoaded", () => {
     startPauseBtn.addEventListener("click", () => {
         if (running) { // To stop
             const data = {
-                RUNNING: false,
-                RESET: false,
+                'update': 'stop'
             };
     
             // Make the POST request
@@ -141,8 +140,7 @@ document.addEventListener("DOMContentLoaded", () => {
             startPauseBtn.textContent = "Start";
         } else { // To start
             const data = {
-                RUNNING: true,
-                RESET: false,
+                'update': 'start'
             };
     
             // Make the POST request
@@ -171,8 +169,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     resetBtn.addEventListener("click", () => {
         const data = {
-            RUNNING: false,
-            RESET: true,
+            'update': 'reset'
         };
 
         // Make the POST request

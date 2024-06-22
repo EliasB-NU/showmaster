@@ -45,7 +45,7 @@ services:
     networks:
       - showmaster-network
     volumes:
-      - ./data:/var/lib/postgresql/data
+      - ./data-db:/var/lib/postgresql/data
 
   pgadmin:
     image: dpage/pgadmin4:latest
@@ -57,7 +57,7 @@ services:
     ports:
       - 8080:80
     volumes:
-      - ./data:/var/lib/pgadmin/data
+      - ./data-pq:/var/lib/pgadmin/data
 
 networks:
   showmaster-network:
