@@ -35,7 +35,7 @@ func InitalCheckup() {
 	if err := db.Ping(); err != nil {
 		log.SetFlags(log.LstdFlags | log.Lshortfile)
 		log.Printf("Error connecting to database: %v\n", err)
-		return
+		panic(err)
 	}
 	db.Exec("CREATE SCHEMA showmaster;")
 }
