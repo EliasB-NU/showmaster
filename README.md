@@ -49,7 +49,7 @@ services:
 
   pgadmin:
     image: dpage/pgadmin4:latest
-    netowkorks:
+    networks:
       - showmaster-network
     environment:
       - PGADMIN_DEFAULT_EMAIL=admin@example.com
