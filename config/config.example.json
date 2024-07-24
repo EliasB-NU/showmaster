@@ -10,8 +10,5 @@
     "Website": {
         "Host": "0.0.0.0",
         "Port": 80
-    },
-
-    // Corresponding to the tablename in the database
-    "Project": "yourproject"
+    }
 }
