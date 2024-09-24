@@ -10,9 +10,8 @@ import (
 )
 
 // GetDB Gets you a connection of the Database
-func GetDB() *sql.DB {
+func GetDB(cfg *config.CFG) *sql.DB {
 	var (
-		cfg   = config.GetConfig()
 		dbURI = fmt.Sprintf("host=%s user=%s dbname=%s sslmode=disable password=%s TimeZone=%s",
 			cfg.DB.Host,
 			cfg.DB.Username,
@@ -39,9 +38,9 @@ func GetDB() *sql.DB {
 }
 
 // InitDB Create schema and tables (if not exist)
-func InitDB() {
+func InitDB(cfg *config.CFG) {
 	var (
-		db  = GetDB()
+		db  = GetDB(cfg)
 		err error
 	)
 	defer func(db *sql.DB) {
