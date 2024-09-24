@@ -1,14 +1,25 @@
 package main
 
 import (
+	"database/sql"
+	"log"
 	"showmaster/src/database"
-	"showmaster/src/web"
+	"showmaster/src/util"
 )
 
-func main() {
-	database.InitalCheckup()
+var DB *sql.DB
 
-	web.SetLogLevel()           // Log level
-	go web.CheckForNewRowSite() // because of import cycle problem, periodic check if there is a new table
-	web.StartTheWeb()           // Inits all the api endpoints and sites
+func main() {
+	log.SetFlags(log.LstdFlags & log.Lshortfile)
+	log.Println("Starting ShowMaster V3 ...")
+
+	// Database
+	database.InitDB()     // Migrates the whole DB and does an initial connection check
+	DB = database.GetDB() // Init the DB var
+
+	// Cache
+	util.CacheProjects(DB) // Initial cache of projects
+	util.CacheUsers(DB)    // Initial cache of users
+
+	log.Println("Started ShowMaster V3")
 }
