@@ -20,6 +20,11 @@ type WEB struct {
 	CFG *config.CFG
 }
 
+type API struct {
+	DB      *sql.DB
+	Clients map[*websocket.Conn]bool
+}
+
 var clients = make(map[*websocket.Conn]bool)
 
 func (w *WEB) InitWeb() {
@@ -43,6 +48,8 @@ func (w *WEB) InitWeb() {
 			AllowMethods: strings.Join([]string{
 				fiber.MethodGet,
 				fiber.MethodPost,
+				fiber.MethodPatch,
+				fiber.MethodDelete,
 			}, ","),
 
 			AllowHeaders: strings.Join([]string{
@@ -91,6 +98,32 @@ func (w *WEB) InitWeb() {
 	app.Get("/monitor", mon) // Monitor
 
 	// API
+	a := API{
+		DB:      w.DB,
+		Clients: clients,
+	}
+	// Login/Register
+	app.Post("/api/login", a.login)       // Login | <- incoming
+	app.Post("/api/register", a.register) // Register | <- incoming
+	// Admin
+	app.Get("/api/getusers", a.getUsers)              // Get all users | -> outgoing
+	app.Patch("/api/updateuser", a.updateUser)        // Update the permission level of a user | <- incoming
+	app.Delete("/api/deleteuser", a.deleteUser)       // Delete a user | <- incoming
+	app.Delete("/api/deleteproject", a.deleteProject) // Delete a project | <- incoming
+	// Tables
+	app.Get("/api/gettables", a.getProjects)       // Get tables | -> outgoing
+	app.Post("/api/newtable", a.newProject)        // New table | <- incoming
+	app.Patch("/api/updatetable", a.updateProject) // Update table | <- incoming
+	// Rows
+	app.Get("/api/getrows", a.getRows)        // Get rows | -> outgoing
+	app.Post("/api/newrow", a.newRow)         // New row | <- incoming
+	app.Patch("/api/updaterow", a.updateRow)  // Update row | <- incoming
+	app.Delete("/api/deleterow", a.deleteRow) // Delete row | <- incoming
+	// Updates
+	app.Get("/api/gethighlightedrow", a.getHighlightedRow)         // Get the currently highlighted row in a project | -> outgoing
+	app.Patch("/api/updatehighlightedrow", a.updateHighlightedRow) // Update the currently highlighted row in a project | <- incoming
+	app.Get("/api/gettimer", a.getTimer)                           // Get the current state and time of the timer | -> outgoing
+	app.Patch("/api/updatetimer", a.updateTimer)                   // Update the timer status (update sent to clients via websocket) | <- incoming
 
 	// Frontend
 	app.Static("/", "./public/dist")
