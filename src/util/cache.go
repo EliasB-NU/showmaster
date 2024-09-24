@@ -12,6 +12,7 @@ var USERS []string
 // PROJECTS list of all projects currently registered
 var PROJECTS []string
 
+// CacheUsers caches the users into a var stored in this file, will be called after every user action
 func CacheUsers(db *sql.DB) {
 	var (
 		execSQL = fmt.Sprintf(`SELECT name FROM showmaster.users`)
@@ -47,6 +48,7 @@ func CacheUsers(db *sql.DB) {
 	}
 }
 
+// CacheProjects caches the projects into a var stored in this file, will be called after every user action
 func CacheProjects(db *sql.DB) {
 	var (
 		execSQL = fmt.Sprintf(`SELECT name FROM showmaster.projects`)

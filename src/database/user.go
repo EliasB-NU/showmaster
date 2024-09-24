@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"showmaster/src/util"
 )
 
 // User struct for a new user
@@ -104,7 +103,7 @@ func NewUser(u User, db *sql.DB) error {
 		err error
 	)
 
-	for _, user := range util.USERS {
+	for _, user := range users {
 		if user == u.Name {
 			err = errors.New("user already exists")
 			return err
@@ -119,7 +118,6 @@ func NewUser(u User, db *sql.DB) error {
 		log.Printf("Error inserting user into database: %v", err)
 		return err
 	} else {
-		util.CacheUsers(db)
 		return nil
 	}
 }
@@ -154,5 +152,44 @@ func DeleteUser(name string, db *sql.DB) error {
 		return err
 	} else {
 		return nil
+	}
+}
+
+// USERS list of all users currently registered
+var users []string
+
+// CacheUsers caches the users into a var stored in this file, will be called after every user action
+func CacheUsers(db *sql.DB) {
+	var (
+		execSQL = fmt.Sprintf(`SELECT name FROM showmaster.users`)
+
+		err error
+	)
+
+	rows, err := db.Query(execSQL)
+	if err != nil {
+		log.SetFlags(log.LstdFlags & log.Lshortfile)
+		log.Printf("Error querying rows from showmaster.users: %d\n", err)
+	}
+	defer func(rows *sql.Rows) {
+		err := rows.Close()
+		if err != nil {
+
+		}
+	}(rows)
+
+	// Processing the results
+	for rows.Next() {
+		var name string
+		if err := rows.Scan(&name); err != nil {
+			log.SetFlags(log.LstdFlags & log.Lshortfile)
+			log.Printf("Error scanning row: %d\n", err)
+		}
+		users = append(users, name)
+	}
+
+	if err := rows.Err(); err != nil {
+		log.SetFlags(log.LstdFlags & log.Lshortfile)
+		log.Printf("Error with rows: %d\n", err)
 	}
 }

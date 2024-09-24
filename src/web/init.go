@@ -15,11 +15,6 @@ import (
 	"strings"
 )
 
-type WEB struct {
-	DB  *sql.DB
-	CFG *config.CFG
-}
-
 type API struct {
 	DB      *sql.DB
 	Clients map[*websocket.Conn]bool
@@ -27,9 +22,9 @@ type API struct {
 
 var clients = make(map[*websocket.Conn]bool)
 
-func (w *WEB) InitWeb() {
+func InitWeb(db *sql.DB, cfg *config.CFG) {
 	var (
-		addr = fmt.Sprintf("%s:%d", w.CFG.Website.Host, w.CFG.Website.Port)
+		addr = fmt.Sprintf("%s:%d", cfg.Website.Host, cfg.Website.Port)
 
 		err error
 
@@ -99,7 +94,7 @@ func (w *WEB) InitWeb() {
 
 	// API
 	a := API{
-		DB:      w.DB,
+		DB:      db,
 		Clients: clients,
 	}
 	// Login/Register
@@ -126,7 +121,7 @@ func (w *WEB) InitWeb() {
 	app.Patch("/api/updatetimer", a.updateTimer)                   // Update the timer status (update sent to clients via websocket) | <- incoming
 
 	// Frontend
-	app.Static("/", "./public/dist")
+	app.Static("/", "./public")
 
 	// Start fiber
 	err = app.Listen(addr)

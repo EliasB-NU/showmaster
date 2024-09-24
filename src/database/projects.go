@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"showmaster/src/util"
 	"time"
 )
 
@@ -76,7 +75,7 @@ func NewProject(name string, creator string, db *sql.DB) error {
 		err error
 	)
 
-	for _, project := range util.PROJECTS {
+	for _, project := range projects {
 		if project == name {
 			err = errors.New("project already exists")
 			return err
@@ -99,7 +98,6 @@ func NewProject(name string, creator string, db *sql.DB) error {
 		return err
 	}
 
-	util.CacheProjects(db)
 	return nil
 }
 
@@ -225,4 +223,43 @@ func DeleteRow(name string, id int, db *sql.DB) error {
 	}
 
 	return nil
+}
+
+// PROJECTS list of all projects currently registered
+var projects []string
+
+// CacheProjects caches the projects into a var stored in this file, will be called after every user action
+func CacheProjects(db *sql.DB) {
+	var (
+		execSQL = fmt.Sprintf(`SELECT name FROM showmaster.projects`)
+
+		err error
+	)
+
+	rows, err := db.Query(execSQL)
+	if err != nil {
+		log.SetFlags(log.LstdFlags & log.Lshortfile)
+		log.Printf("Error querying rows from showmaster.users: %d\n", err)
+	}
+	defer func(rows *sql.Rows) {
+		err := rows.Close()
+		if err != nil {
+
+		}
+	}(rows)
+
+	// Processing the results
+	for rows.Next() {
+		var name string
+		if err := rows.Scan(&name); err != nil {
+			log.SetFlags(log.LstdFlags & log.Lshortfile)
+			log.Printf("Error scanning row: %d\n", err)
+		}
+		projects = append(projects, name)
+	}
+
+	if err := rows.Err(); err != nil {
+		log.SetFlags(log.LstdFlags & log.Lshortfile)
+		log.Printf("Error with rows: %d\n", err)
+	}
 }
