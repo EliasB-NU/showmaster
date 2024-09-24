@@ -8,8 +8,6 @@ services:
       context: .
       dockerfile: DOCKERFILE
     restart: always
-    networks:
-      - showmaster-network
     ports:
       - "80:80"
     depends_on:
@@ -18,7 +16,9 @@ services:
       - DBUser=showmaster
       - DBPassword=password
       - Database=showmaster
-      - ProjectName=yourproject
+      - TimeZone=Europe/Berlin
+      - AdminUserName=admin
+      - AdminPassword=1234
 
   db:
     image: postgres:16-alpine
@@ -27,15 +27,13 @@ services:
       - POSTGRES_USER=showmaster
       - POSTGRES_PASSWORD=password
     ports:
-      - 5432:5432
-    networks:
-      - showmaster-network
+      - "5432:5432"
     volumes:
-      - ./data:/var/lib/postgresql/data
+      - psql-data:/var/lib/postgresql/data
 
   #pgadmin:
   #  image: dpage/pgadmin4:latest
-  #  netowork:
+  #  network:
   #    - showmaster-network
   #  environment:
   #    - PGADMIN_DEFAULT_EMAIL=admin@example.com
@@ -43,6 +41,5 @@ services:
   #  ports:
   #    - 8080:80
 
-networks:
-  showmaster-network:
-    external: false
+volumes:
+  psql-data:

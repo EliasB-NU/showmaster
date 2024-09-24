@@ -4,7 +4,13 @@
         "Port": 5432,
         "Username": "showmaster",
         "Password": "SomeSecurePassword",
-        "Database": "showmaster"
+        "Database": "showmaster",
+        "TimeZone": "Europe/Berlin"
+    },
+
+    "User": {
+        "AdminUserName": "admin",
+        "AdminPassword": "adminPassword"
     },
 
     "Website": {
