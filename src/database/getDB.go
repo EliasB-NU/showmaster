@@ -10,9 +10,8 @@ import (
 )
 
 // GetDB Gets you a connection of the Database
-func GetDB() *sql.DB {
+func GetDB(cfg *config.CFG) *sql.DB {
 	var (
-		cfg   = config.GetConfig()
 		dbURI = fmt.Sprintf("host=%s user=%s dbname=%s sslmode=disable password=%s TimeZone=%s",
 			cfg.DB.Host,
 			cfg.DB.Username,
@@ -26,10 +25,10 @@ func GetDB() *sql.DB {
 	// Open connection to database
 	db, err := gorm.Open(postgres.Open(dbURI), &gorm.Config{})
 	if err != nil {
-		log.SetFlags(log.LstdFlags & log.Lshortfile)
+		log.SetFlags(log.LstdFlags | log.Lshortfile)
 		log.Fatalf("Error connecting to database: %d\n", err)
 	} else {
-		log.SetFlags(log.LstdFlags & log.Lshortfile)
+		log.SetFlags(log.LstdFlags | log.Lshortfile)
 		log.Println("Successfully connected to database")
 	}
 
@@ -39,9 +38,9 @@ func GetDB() *sql.DB {
 }
 
 // InitDB Create schema and tables (if not exist)
-func InitDB() {
+func InitDB(cfg *config.CFG) {
 	var (
-		db  = GetDB()
+		db  = GetDB(cfg)
 		err error
 	)
 	defer func(db *sql.DB) {
@@ -54,7 +53,7 @@ func InitDB() {
 	// Create schema
 	_, err = db.Exec("CREATE SCHEMA IF NOT EXISTS showmaster;")
 	if err != nil {
-		log.SetFlags(log.LstdFlags & log.Lshortfile)
+		log.SetFlags(log.LstdFlags | log.Lshortfile)
 		log.Fatalf("Error creating schema: %d\n", err)
 	} else {
 		log.Println("Successfully created schema")
@@ -66,12 +65,13 @@ func InitDB() {
 		    id SERIAL PRIMARY KEY,
 		    name TEXT,
 		    projecttable TEXT,
-		    creator TEXT
+		    creator TEXT,
+		    timer interval
 		);`)
 
 	_, err = db.Exec(execSqlProjects)
 	if err != nil {
-		log.SetFlags(log.LstdFlags & log.Lshortfile)
+		log.SetFlags(log.LstdFlags | log.Lshortfile)
 		log.Fatalf("Error creating table: %d\n", err)
 	} else {
 		log.Println("Successfully created table : projects")
@@ -89,9 +89,9 @@ func InitDB() {
 
 	_, err = db.Exec(execSqlUsers)
 	if err != nil {
-		log.SetFlags(log.LstdFlags & log.Lshortfile)
+		log.SetFlags(log.LstdFlags | log.Lshortfile)
 		log.Fatalf("Error creating table: %d\n", err)
 	} else {
-		log.Println("Successfully created : users")
+		log.Println("Successfully created table : users")
 	}
 }

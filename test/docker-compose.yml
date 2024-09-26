@@ -1,0 +1,39 @@
+# Showmaster Docker compose file
+
+services:
+  app:
+    image: braunelias/showmaster:latest
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - db
+    environment:
+      - DBUser=showmaster
+      - DBPassword=password
+      - Database=showmaster
+      - TimeZone=Europe/Berlin
+      - AdminUserName=admin
+      - AdminPassword=1234
+
+  db:
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=showmaster
+      - POSTGRES_PASSWORD=password
+    ports:
+      - "5432:5432"
+    volumes:
+      - psql-data:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@example.com
+      - PGADMIN_DEFAULT_PASSWORD=SomeSecurePassword
+    ports:
+      - "8080:80"
+
+volumes:
+  psql-data:

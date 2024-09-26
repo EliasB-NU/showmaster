@@ -1,4 +1,4 @@
-FROM golang:1.22.3-alpine AS builder
+FROM golang:1.23.1-alpine AS builder-go
 
 WORKDIR /app
 
@@ -10,15 +10,29 @@ COPY src/ ./src/
 
 RUN go build ./src/main.go
 
+
+
+FROM node:current-alpine AS builder-npm
+
+WORKDIR /web
+
+COPY public/ ./
+
+RUN npm install
+
+RUN npm run build
+
+
+
 FROM alpine:latest
 
 RUN apk --no-cache add ca-certificates
 
 WORKDIR /app
 
-COPY --from=builder /app/main .
+COPY --from=builder-go /app/main .
 
-COPY public/ ./public/
+COPY --from=builder-npm /web/dist ./public
 
 EXPOSE 80
 

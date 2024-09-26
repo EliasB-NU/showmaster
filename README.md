@@ -1,21 +1,21 @@
-# ShowMaster - V2
+# ShowMaster - V3 (W.I.P. | latest stable version V2.3.1 (read readme in the v2.3.1 branch))
 
 This is a cross-platform/browser synced list of scenes for your local event.  
   
 You can highlight a specific scene by clicking on it or moving the currently highlighted scene with your up/down arrow keys. 
 The currently highlighted row is synced with every device.  
 
-
-To add data to showmaster, you need to use a database tool like Jetbrains DataGrip or pqAdmin, maybe I will create an admin panel in the future. 
+It has a fully interactive web ui to move the different entries around and edit them,
+watch the showcase video for more information
 
 ## Showcase
-I am too stupid to embed a video in the readme, you can download it in the media folder, sorry for any troubles
+Coming soon
 
 ## Setup
-Just copy the contents of the "docker compose" file to your local machine, I assume you have docker & docker compose installed, and run it. On the mainpage you can create and select projects.  
-To easily add data, I included a pgadmin4 service, you can include it, to get a fast and easy option to view and edit the database in the web.
+Just copy the contents of the "docker compose" file to your local machine, 
+I assume you have docker & docker compose installed, and run it.
 
-Example Docker Compose File:
+**Example Docker Compose File:**
 
 ```yaml
 # Showmaster Docker compose file
@@ -29,12 +29,12 @@ services:
     depends_on:
       - db
     environment:
-      - DBUser=showmaster
-      - DBPassword=password
+      - DBUser=showmaster      # Should correspond to the environment variables ->
+      - DBPassword=password    # set in the db section of this docker compose file
       - Database=showmaster
-      - TimeZone=Europe/Berlin
-      - AdminUserName=admin
-      - AdminPassword=1234
+      - TimeZone=Europe/Berlin # Change to your local timezone
+      - AdminUserName=admin    # Email is admin@example.com
+      - AdminPassword=1234     # Please change to a secure password
 
   db:
     image: postgres:16-alpine
@@ -47,16 +47,6 @@ services:
     volumes:
       - psql-data:/var/lib/postgresql/data
 
-  pgadmin:
-    image: dpage/pgadmin4:latest
-    environment:
-      - PGADMIN_DEFAULT_EMAIL=admin@example.com
-      - PGADMIN_DEFAULT_PASSWORD=SomeSecurePassword
-    ports:
-      - "8080:80"
-
 volumes:
   psql-data:
 ```
-
-This docker compose file includes a pqadmin instance for easy management. If you want to use another piece of software, just remove it.
