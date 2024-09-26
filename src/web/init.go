@@ -12,6 +12,7 @@ import (
 	"github.com/gofiber/websocket/v2"
 	"log"
 	"showmaster/src/config"
+	"showmaster/src/util"
 	"strings"
 )
 
@@ -56,10 +57,8 @@ func InitWeb(db *sql.DB, cfg *config.CFG) {
 
 		// Basic Auth
 		auth = basicauth.New(basicauth.Config{
-			Next: checkAuth,
-			Users: map[string]string{
-				"showmaster": "12345678",
-			},
+			Next:            checkAuth,
+			Users:           util.GetAdminUsers(db),
 			Realm:           "Forbidden",
 			ContextUsername: "_user",
 			ContextPassword: "_pass",
@@ -93,40 +92,45 @@ func InitWeb(db *sql.DB, cfg *config.CFG) {
 	app.Get("/monitor", mon) // Monitor
 
 	// API
+	api := fiber.New()
+	app.Mount("/api", api)
 	a := API{
 		DB:      db,
 		Clients: clients,
 	}
+	// Websocket
+	api.Get("/ws", websocket.New(a.WebsocketConnection))
 	// Login/Register
-	app.Post("/api/login", a.login)       // Login | <- incoming
-	app.Post("/api/register", a.register) // Register | <- incoming
+	api.Post("/login", a.login)       // Login | <- incoming
+	api.Post("/register", a.register) // Register | <- incoming
 	// Admin
-	app.Get("/api/getusers", a.getUsers)              // Get all users | -> outgoing
-	app.Patch("/api/updateuser", a.updateUser)        // Update the permission level of a user | <- incoming
-	app.Delete("/api/deleteuser", a.deleteUser)       // Delete a user | <- incoming
-	app.Delete("/api/deleteproject", a.deleteProject) // Delete a project | <- incoming
+	api.Get("/admin/getusers", a.getUsers)              // Get all users | -> outgoing
+	api.Patch("/admin/updateuser", a.updateUser)        // Update the permission level of a user | <- incoming
+	api.Delete("/admin/deleteuser", a.deleteUser)       // Delete a user | <- incoming
+	api.Delete("/admin/deleteproject", a.deleteProject) // Delete a project | <- incoming
 	// Tables
-	app.Get("/api/gettables", a.getProjects)       // Get tables | -> outgoing
-	app.Post("/api/newtable", a.newProject)        // New table | <- incoming
-	app.Patch("/api/updatetable", a.updateProject) // Update table | <- incoming
+	api.Get("/getprojects", a.getProjects)       // Get tables | -> outgoing
+	api.Post("/newproject", a.newProject)        // New table | <- incoming
+	api.Patch("/updateproject", a.updateProject) // Update table | <- incoming
 	// Rows
-	app.Get("/api/getrows", a.getRows)        // Get rows | -> outgoing
-	app.Post("/api/newrow", a.newRow)         // New row | <- incoming
-	app.Patch("/api/updaterow", a.updateRow)  // Update row | <- incoming
-	app.Delete("/api/deleterow", a.deleteRow) // Delete row | <- incoming
+	api.Get("/getrows:project", a.getRows)        // Get rows | -> outgoing
+	api.Post("/newrow:project", a.newRow)         // New row | <- incoming
+	api.Patch("/updaterow:project", a.updateRow)  // Update row | <- incoming
+	api.Delete("/deleterow:project", a.deleteRow) // Delete row | <- incoming
 	// Updates
-	app.Get("/api/gethighlightedrow", a.getHighlightedRow)         // Get the currently highlighted row in a project | -> outgoing
-	app.Patch("/api/updatehighlightedrow", a.updateHighlightedRow) // Update the currently highlighted row in a project | <- incoming
-	app.Get("/api/gettimer", a.getTimer)                           // Get the current state and time of the timer | -> outgoing
-	app.Patch("/api/updatetimer", a.updateTimer)                   // Update the timer status (update sent to clients via websocket) | <- incoming
+	api.Get("/gethighlightedrow:project", a.getHighlightedRow)         // Get the currently highlighted row in a project | -> outgoing
+	api.Patch("/updatehighlightedrow:project", a.updateHighlightedRow) // Update the currently highlighted row in a project | <- incoming
+	api.Get("/gettimer:project", a.getTimer)                           // Get the current state and time of the timer | -> outgoing
+	api.Patch("/updatetimer:project", a.updateTimer)                   // Update the timer status (update sent to clients via websocket) | <- incoming
 
 	// Frontend
 	app.Static("/", "./public")
 
 	// Start fiber
+	log.Println("Started ShowMaster V3")
 	err = app.Listen(addr)
 	if err != nil {
-		log.SetFlags(log.LstdFlags & log.Lshortfile)
+		log.SetFlags(log.LstdFlags | log.Lshortfile)
 		log.Fatalf("Web init error: %d\n", err)
 	}
 }

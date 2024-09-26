@@ -17,7 +17,7 @@ type User struct {
 
 func GetUsers(db *sql.DB) ([]User, error) {
 	var (
-		execSQL = fmt.Sprintf(`SELECT * FROM showmaster.users;`)
+		execSQL = fmt.Sprintf(`SELECT name, email, permlvl FROM showmaster.users;`)
 
 		users []User
 		err   error
@@ -25,73 +25,62 @@ func GetUsers(db *sql.DB) ([]User, error) {
 
 	rows, err := db.Query(execSQL)
 	if err != nil {
-		log.SetFlags(log.LstdFlags & log.Lshortfile)
+		log.SetFlags(log.LstdFlags | log.Lshortfile)
 		log.Printf("Error querying user rows: %d\n", err)
 		return nil, err
 	}
-	defer func(rows *sql.Rows) {
-		err := rows.Close()
-		if err != nil {
-
-		}
-	}(rows)
+	defer rows.Close()
 
 	for rows.Next() {
 		var user User
-		err = rows.Scan(&user.Name, &user.Email, &user.Password, &user.PermissionLevel)
+		err = rows.Scan(&user.Name, &user.Email, &user.PermissionLevel)
 		if err != nil {
-			log.SetFlags(log.LstdFlags & log.Lshortfile)
-			log.Printf("Error scanning user rows: %d\n\n", err)
+			log.SetFlags(log.LstdFlags | log.Lshortfile)
+			log.Printf("Error scanning user rows: %d\n", err)
 			return nil, err
 		}
 		users = append(users, user)
 	}
 
 	if err := rows.Err(); err != nil {
-		log.SetFlags(log.LstdFlags & log.Lshortfile)
-		log.Printf("Error iterating over user rows: %v", err)
+		log.SetFlags(log.LstdFlags | log.Lshortfile)
+		log.Printf("Error iterating over user rows: %d\n", err)
 		return nil, err
 	}
 
 	return users, nil
 }
 
-func GetUserPermissionLevel(name string, db *sql.DB) (int, error) {
+// CheckIfRegistered checks if a user is registered and if yes, the password: Password match: 202; Password mismatch: 403; Unregistered: 404
+func CheckIfRegistered(email string, password string, db *sql.DB) (int, error) {
 	var (
-		execSQL = fmt.Sprintf(`SELECT users.permlvl FROM showmaster.users WHERE name='%s';`, name)
-
-		err error
+		execSQL = fmt.Sprintf(`SELECT password FROM showmaster.users WHERE email='%s';`, email)
+		err     error
 	)
+
 	rows, err := db.Query(execSQL)
 	if err != nil {
-		log.SetFlags(log.LstdFlags & log.Lshortfile)
+		log.SetFlags(log.LstdFlags | log.Lshortfile)
 		log.Printf("Error querying user rows: %d\n", err)
 		return 0, err
 	}
-	defer func(rows *sql.Rows) {
-		err := rows.Close()
-		if err != nil {
-
-		}
-	}(rows)
+	defer rows.Close()
 
 	for rows.Next() {
-		var permlvl int
-		err = rows.Scan(&permlvl)
+		var pwd string
+		err = rows.Scan(&pwd)
 		if err != nil {
-			log.SetFlags(log.LstdFlags & log.Lshortfile)
+			log.SetFlags(log.LstdFlags | log.Lshortfile)
 			log.Printf("Error scanning over user rows: %d\n", err)
+			return 0, err
 		}
-		return permlvl, nil
+		if password != pwd {
+			return 0, nil
+		} else {
+			return 1, nil
+		}
 	}
-
-	if err := rows.Err(); err != nil {
-		log.SetFlags(log.LstdFlags & log.Lshortfile)
-		log.Printf("Error iterating over user rows: %v", err)
-		return 0, err
-	}
-
-	return 0, nil
+	return 2, nil
 }
 
 // NewUser creates a user, needs the user struct from this package
@@ -102,6 +91,7 @@ func NewUser(u User, db *sql.DB) error {
 
 		err error
 	)
+	cacheUsers(db)
 
 	for _, user := range users {
 		if user == u.Name {
@@ -114,12 +104,12 @@ func NewUser(u User, db *sql.DB) error {
 
 	_, err = db.Exec(execSQL)
 	if err != nil {
-		log.SetFlags(log.LstdFlags & log.Lshortfile)
-		log.Printf("Error inserting user into database: %v", err)
+		log.SetFlags(log.LstdFlags | log.Lshortfile)
+		log.Printf("Error inserting user into database: %d\n", err)
 		return err
-	} else {
-		return nil
 	}
+
+	return nil
 }
 
 // UpdateUser only for updating the permission level
@@ -131,12 +121,12 @@ func UpdateUser(name string, permissionLevel int, db *sql.DB) error {
 	)
 	_, err = db.Exec(execSQL)
 	if err != nil {
-		log.SetFlags(log.LstdFlags & log.Lshortfile)
-		log.Printf("Error updating user into database: %v", err)
+		log.SetFlags(log.LstdFlags | log.Lshortfile)
+		log.Printf("Error updating user into database: %d\n", err)
 		return err
-	} else {
-		return nil
 	}
+
+	return nil
 }
 
 func DeleteUser(name string, db *sql.DB) error {
@@ -147,19 +137,19 @@ func DeleteUser(name string, db *sql.DB) error {
 	)
 	_, err = db.Exec(execSQL)
 	if err != nil {
-		log.SetFlags(log.LstdFlags & log.Lshortfile)
+		log.SetFlags(log.LstdFlags | log.Lshortfile)
 		log.Printf("Error deleting user: %d\n", err)
 		return err
-	} else {
-		return nil
 	}
+
+	return nil
 }
 
 // USERS list of all users currently registered
 var users []string
 
 // CacheUsers caches the users into a var stored in this file, will be called after every user action
-func CacheUsers(db *sql.DB) {
+func cacheUsers(db *sql.DB) {
 	var (
 		execSQL = fmt.Sprintf(`SELECT name FROM showmaster.users`)
 
@@ -168,7 +158,7 @@ func CacheUsers(db *sql.DB) {
 
 	rows, err := db.Query(execSQL)
 	if err != nil {
-		log.SetFlags(log.LstdFlags & log.Lshortfile)
+		log.SetFlags(log.LstdFlags | log.Lshortfile)
 		log.Printf("Error querying rows from showmaster.users: %d\n", err)
 	}
 	defer func(rows *sql.Rows) {
@@ -182,14 +172,14 @@ func CacheUsers(db *sql.DB) {
 	for rows.Next() {
 		var name string
 		if err := rows.Scan(&name); err != nil {
-			log.SetFlags(log.LstdFlags & log.Lshortfile)
+			log.SetFlags(log.LstdFlags | log.Lshortfile)
 			log.Printf("Error scanning row: %d\n", err)
 		}
 		users = append(users, name)
 	}
 
 	if err := rows.Err(); err != nil {
-		log.SetFlags(log.LstdFlags & log.Lshortfile)
+		log.SetFlags(log.LstdFlags | log.Lshortfile)
 		log.Printf("Error with rows: %d\n", err)
 	}
 }

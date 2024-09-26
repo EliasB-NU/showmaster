@@ -9,9 +9,9 @@ import (
 )
 
 type Project struct {
-	Name    string
-	Table   string
-	Creator string
+	Name    string `json:"name"`
+	Table   string `json:"table"`
+	Creator string `json:"creator"`
 }
 
 func GetProjects(db *sql.DB) ([]Project, error) {
@@ -24,32 +24,27 @@ func GetProjects(db *sql.DB) ([]Project, error) {
 
 	rows, err := db.Query(execSQL)
 	if err != nil {
-		log.SetFlags(log.LstdFlags & log.Lshortfile)
+		log.SetFlags(log.LstdFlags | log.Lshortfile)
 		log.Printf("Error querying rows: %d\n", err)
 		return nil, err
 	}
-	defer func(rows *sql.Rows) {
-		err := rows.Close()
-		if err != nil {
+	defer rows.Close()
 
-		}
-	}(rows)
+	if err := rows.Err(); err != nil {
+		log.SetFlags(log.LstdFlags | log.Lshortfile)
+		log.Printf("Error iterating over rows: %d\n", err)
+		return nil, err
+	}
 
 	for rows.Next() {
 		var project Project
 		err = rows.Scan(&project.Name, &project.Table, &project.Creator)
 		if err != nil {
-			log.SetFlags(log.LstdFlags & log.Lshortfile)
+			log.SetFlags(log.LstdFlags | log.Lshortfile)
 			log.Printf("Error scanning rows: %d\n", err)
 			return nil, err
 		}
 		projects = append(projects, project)
-	}
-
-	if err := rows.Err(); err != nil {
-		log.SetFlags(log.LstdFlags & log.Lshortfile)
-		log.Printf("Error iterating over rows: %v", err)
-		return nil, err
 	}
 
 	return projects, nil
@@ -74,26 +69,25 @@ func NewProject(name string, creator string, db *sql.DB) error {
 
 		err error
 	)
+	cacheProjects(db)
 
 	for _, project := range projects {
 		if project == name {
 			err = errors.New("project already exists")
 			return err
-		} else {
-			continue
 		}
 	}
 
 	_, err = db.Exec(execSqlProjectRow)
 	if err != nil {
-		log.SetFlags(log.LstdFlags & log.Lshortfile)
+		log.SetFlags(log.LstdFlags | log.Lshortfile)
 		log.Fatalf("Error inserting new project: %d\n", err)
 		return err
 	}
 
 	_, err = db.Exec(execSqlProjectTable)
 	if err != nil {
-		log.SetFlags(log.LstdFlags & log.Lshortfile)
+		log.SetFlags(log.LstdFlags | log.Lshortfile)
 		log.Fatalf("Error creating new project table: %d\n", err)
 		return err
 	}
@@ -110,7 +104,7 @@ func UpdateProject(oldName string, newName string, db *sql.DB) error {
 
 	_, err = db.Exec(execSql)
 	if err != nil {
-		log.SetFlags(log.LstdFlags & log.Lshortfile)
+		log.SetFlags(log.LstdFlags | log.Lshortfile)
 		log.Fatalf("Error updating project table: %d\n", err)
 		return err
 	}
@@ -127,15 +121,31 @@ func DeleteProject(name string, db *sql.DB) error {
 
 	_, err = db.Exec(execSQLRow)
 	if err != nil {
-		log.SetFlags(log.LstdFlags & log.Lshortfile)
+		log.SetFlags(log.LstdFlags | log.Lshortfile)
 		log.Fatalf("Error deleting project: %d\n", err)
 		return err
 	}
 
 	_, err = db.Exec(execSQLTable)
 	if err != nil {
-		log.SetFlags(log.LstdFlags & log.Lshortfile)
+		log.SetFlags(log.LstdFlags | log.Lshortfile)
 		log.Fatalf("Error deleting project table: %d\n", err)
+		return err
+	}
+
+	return nil
+}
+
+// UpdateTimer updates the time stored in the db
+func UpdateTimer(t time.Duration, name string, db *sql.DB) error {
+	var (
+		execSQL = fmt.Sprintf(`UPDATE showmaster.projects SET timer= '%d' WHERE name = '%s'`, t, name)
+		err     error
+	)
+	_, err = db.Exec(execSQL)
+	if err != nil {
+		log.SetFlags(log.LstdFlags | log.Lshortfile)
+		log.Fatalf("Error updating timer table: %d\n", err)
 		return err
 	}
 
@@ -144,35 +154,71 @@ func DeleteProject(name string, db *sql.DB) error {
 
 // Row the row used by the individual projects
 type Row struct {
-	id    int
-	pos   float32
-	name  string
-	audio string
-	light string
-	pptx  string
-	notes string
-	timer time.Duration
+	Id    int            `json:"id"`
+	Pos   float32        `json:"pos"`
+	Name  string         `json:"name"`
+	Audio *string        `json:"audio"`
+	Light *string        `json:"light"`
+	PPTX  *string        `json:"pptx"`
+	Notes *string        `json:"notes"`
+	Timer *time.Duration `json:"timer"`
+}
+
+// GetRows Get all the rows from a project
+func GetRows(project string, db *sql.DB) ([]Row, error) {
+	var (
+		data    []Row
+		execSQL = fmt.Sprintf(`SELECT * FROM showmaster.%s`, project)
+
+		err error
+	)
+	rows, err := db.Query(execSQL)
+	if err != nil {
+		log.SetFlags(log.LstdFlags | log.Lshortfile)
+		log.Printf("Error querying rows: %d\n", err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	if err := rows.Err(); err != nil {
+		log.SetFlags(log.LstdFlags | log.Lshortfile)
+		log.Printf("Error iterating over rows: %d\n", err)
+		return nil, err
+	}
+
+	for rows.Next() {
+		var row Row
+		err = rows.Scan(&row.Id, &row.Pos, &row.Name, &row.Audio, &row.Light, &row.PPTX, &row.Notes, &row.Timer)
+		if err != nil {
+			log.SetFlags(log.LstdFlags | log.Lshortfile)
+			log.Printf("Error scanning rows: %d\n", err)
+			return nil, err
+		}
+		data = append(data, row)
+	}
+
+	return data, nil
 }
 
 // NewRow to insert into a project
-func NewRow(name string, r Row, db *sql.DB) error {
+func NewRow(project string, r Row, db *sql.DB) error {
 	var (
 		execSQL = fmt.Sprintf(`INSERT INTO showmaster.%s (pos, name, audio, light, pptx, notes, timer) VALUES (%f, '%s', '%s', '%s', '%s', '%s', %d);`,
-			name+"table",
-			r.pos,
-			r.name,
-			r.audio,
-			r.light,
-			r.pptx,
-			r.notes,
-			r.timer)
+			project,
+			r.Pos,
+			r.Name,
+			r.Audio,
+			r.Light,
+			r.PPTX,
+			r.Notes,
+			r.Timer)
 
 		err error
 	)
 
 	_, err = db.Exec(execSQL)
 	if err != nil {
-		log.SetFlags(log.LstdFlags & log.Lshortfile)
+		log.SetFlags(log.LstdFlags | log.Lshortfile)
 		log.Fatalf("Error inserting new row: %d\n", err)
 		return err
 	}
@@ -181,25 +227,25 @@ func NewRow(name string, r Row, db *sql.DB) error {
 }
 
 // UpdateRow to update an existing row
-func UpdateRow(name string, r Row, id int, db *sql.DB) error {
+func UpdateRow(project string, r Row, db *sql.DB) error {
 	var (
 		execSQL = fmt.Sprintf(`UPDATE showmaster.%s SET pos = %f, name = '%s', audio = '%s', light = '%s', pptx = '%s', notes = '%s', timer = %d WHERE id = %d;`,
-			name+"table",
-			r.pos,
-			r.name,
-			r.audio,
-			r.light,
-			r.pptx,
-			r.notes,
-			r.timer,
-			id)
+			project,
+			r.Pos,
+			r.Name,
+			r.Audio,
+			r.Light,
+			r.PPTX,
+			r.Notes,
+			r.Timer,
+			r.Id)
 
 		err error
 	)
 
 	_, err = db.Exec(execSQL)
 	if err != nil {
-		log.SetFlags(log.LstdFlags & log.Lshortfile)
+		log.SetFlags(log.LstdFlags | log.Lshortfile)
 		log.Fatalf("Error updating row: %d\n", err)
 		return err
 	}
@@ -208,16 +254,16 @@ func UpdateRow(name string, r Row, id int, db *sql.DB) error {
 }
 
 // DeleteRow to delete a specific row
-func DeleteRow(name string, id int, db *sql.DB) error {
+func DeleteRow(project string, id int, db *sql.DB) error {
 	var (
-		execSQL = fmt.Sprintf(`DELETE FROM showmaster.%s WHERE id = %d;`, name+"table", id)
+		execSQL = fmt.Sprintf(`DELETE FROM showmaster.%s WHERE id = %d;`, project, id)
 
 		err error
 	)
 
 	_, err = db.Exec(execSQL)
 	if err != nil {
-		log.SetFlags(log.LstdFlags & log.Lshortfile)
+		log.SetFlags(log.LstdFlags | log.Lshortfile)
 		log.Fatalf("Error deleting row: %d\n", err)
 		return err
 	}
@@ -229,7 +275,7 @@ func DeleteRow(name string, id int, db *sql.DB) error {
 var projects []string
 
 // CacheProjects caches the projects into a var stored in this file, will be called after every user action
-func CacheProjects(db *sql.DB) {
+func cacheProjects(db *sql.DB) {
 	var (
 		execSQL = fmt.Sprintf(`SELECT name FROM showmaster.projects`)
 
@@ -238,7 +284,7 @@ func CacheProjects(db *sql.DB) {
 
 	rows, err := db.Query(execSQL)
 	if err != nil {
-		log.SetFlags(log.LstdFlags & log.Lshortfile)
+		log.SetFlags(log.LstdFlags | log.Lshortfile)
 		log.Printf("Error querying rows from showmaster.users: %d\n", err)
 	}
 	defer func(rows *sql.Rows) {
@@ -252,14 +298,14 @@ func CacheProjects(db *sql.DB) {
 	for rows.Next() {
 		var name string
 		if err := rows.Scan(&name); err != nil {
-			log.SetFlags(log.LstdFlags & log.Lshortfile)
+			log.SetFlags(log.LstdFlags | log.Lshortfile)
 			log.Printf("Error scanning row: %d\n", err)
 		}
 		projects = append(projects, name)
 	}
 
 	if err := rows.Err(); err != nil {
-		log.SetFlags(log.LstdFlags & log.Lshortfile)
+		log.SetFlags(log.LstdFlags | log.Lshortfile)
 		log.Printf("Error with rows: %d\n", err)
 	}
 }

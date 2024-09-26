@@ -53,13 +53,13 @@ func (s *Stopwatch) Reset() {
 	s.accumulated = 0
 }
 
-func (s *Stopwatch) ElapsedSeconds() float64 {
+func (s *Stopwatch) ElapsedSeconds() time.Duration {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 	if s.Running {
-		return s.accumulated.Seconds() + time.Since(s.startTime).Seconds()
+		return time.Duration(s.accumulated.Seconds() + time.Since(s.startTime).Seconds())
 	}
-	return s.accumulated.Seconds()
+	return time.Duration(s.accumulated.Seconds())
 }
 
 func (s *Stopwatch) runTimer() {
@@ -74,4 +74,10 @@ func (s *Stopwatch) runTimer() {
 		}
 		s.mutex.Unlock()
 	}
+}
+
+func (s *Stopwatch) SetElapsedSeconds(elapsed float64) {
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
+	s.accumulated += time.Duration(elapsed)
 }

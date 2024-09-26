@@ -1,45 +1,34 @@
 package web
 
 import (
-	"encoding/json"
 	"github.com/gofiber/websocket/v2"
 	"log"
 )
 
-func WebsocketConnection(c *websocket.Conn) {
-	if !c.Locals("allowed").(bool) {
-		log.Println("WebSocket upgrade not allowed")
-		if err := c.Close(); err != nil {
-			log.SetFlags(log.LstdFlags & log.Lshortfile)
-			log.Printf("Unable to close websocket connection: %d\n", err)
-		}
-		return
-	}
-
+func (a *API) WebsocketConnection(c *websocket.Conn) {
 	clients[c] = true
 
 	for {
-		_, _, err := c.ReadMessage()
+		_, p, err := c.ReadMessage()
+		log.Println(string(p))
 		if err != nil {
 			break
 		}
 	}
 }
 
-func SendMessage(msg string) {
-	jsonMSG, _ := json.Marshal(msg)
-
+func SendMessage(msg []byte) {
 	for client := range clients {
-		err := client.WriteMessage(websocket.TextMessage, jsonMSG)
+		err := client.WriteMessage(websocket.TextMessage, msg)
 		if err != nil {
 			if err := client.Close(); err != nil {
-				log.SetFlags(log.LstdFlags & log.Lshortfile)
+				log.SetFlags(log.LstdFlags | log.Lshortfile)
 				log.Printf("Unable to close websocket connection: %d\n", err)
 			}
-			delete(clients, client)
 			log.SetFlags(log.LstdFlags | log.Lshortfile)
-			log.Printf("Error sending message: %v\n", err)
+			log.Printf("Error sending message: %d\n", err)
 			log.Println("Deleting client ...")
+			delete(clients, client)
 		}
 	}
 }

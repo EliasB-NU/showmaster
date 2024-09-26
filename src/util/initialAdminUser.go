@@ -7,7 +7,7 @@ import (
 	"showmaster/src/database"
 )
 
-func CreateInitialAdminUSer(db *sql.DB, cfg *config.CFG) {
+func CreateInitialAdminUser(db *sql.DB, cfg *config.CFG) {
 	var (
 		u = database.User{
 			Name:            cfg.User.AdminUserName,
@@ -20,7 +20,7 @@ func CreateInitialAdminUSer(db *sql.DB, cfg *config.CFG) {
 	)
 	err = database.NewUser(u, db)
 	if err != nil {
-		log.SetFlags(log.LstdFlags & log.Lshortfile)
+		log.SetFlags(log.LstdFlags | log.Lshortfile)
 		log.Printf("Error creating admin user: %d\n", err)
 	}
 }
