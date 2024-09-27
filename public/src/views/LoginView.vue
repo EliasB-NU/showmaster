@@ -2,9 +2,12 @@
 import { ref } from 'vue'
 import axios from 'axios'
 import router from '@/router/index.js'
+import Footer from '@/components/Footer.vue'
+import Header from '@/components/Header.vue'
 
 export default {
   name: "LoginComponent",
+  components: { Header, Footer },
   setup() {
     if (localStorage.getItem('logedIn')) {
       router.push('/home');
@@ -133,10 +136,7 @@ export default {
 
 <template>
   <div class="page-container">
-    <!-- Header Section -->
-    <header class="header">
-      <div class="header-title">ShowMaster V3</div>
-    </header>
+    <Header project="" logout=false />
 
     <!-- Login Section -->
     <div class="login-container">
@@ -234,144 +234,11 @@ export default {
     <div v-if="loginPopUp" class="modal-overlay">
       <div class="modal-content">
         <p>{{ loginErrorMessage }}</p>
-        <button @click="closeLoginPopUp" class="btn-primary">Close</button>
+        <button @click="closeLoginPopUp" class="btn-primary">Confirm</button>
       </div>
     </div>
 
-    <!-- Footer -->
-    <footer class="footer">
-      <span>Copyright: Elias Braun 2024</span>
-      <a href="https://github.com/EliasB-NU/showmaster" target="_blank" class="footer-link">
-        GitHub
-      </a>
-    </footer>
+    <Footer/>
   </div>
 </template>
 
-<style scoped>
-/* Overall page container */
-.page-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  background-color: #f4f7fa;
-  padding: 20px;
-  box-sizing: border-box;
-}
-
-/* Login Stuff */
-.login-box {
-  background-color: #fff;
-  padding: 30px;
-  border-radius: 15px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-  min-width: 350px;
-  max-width: 1000px;
-  margin-bottom: 15px;
-}
-
-/* Centering the login box */
-.login-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-grow: 0.5;
-}
-
-/* Styling the login form */
-h2 {
-  font-size: 28px;
-  margin-bottom: 25px;
-  text-align: center;
-}
-
-.form-group {
-  margin-bottom: 25px;
-}
-
-label {
-  font-size: 16px;
-  color: #555;
-  margin-bottom: 8px;
-  display: block;
-}
-
-.input-control {
-  width: 100%;
-  padding: 14px;
-  border-radius: 6px;
-  border: 1px solid #ddd;
-  font-size: 18px;
-  box-sizing: border-box;
-}
-
-/* Primary Button */
-.btn-primary {
-  width: 100%;
-  padding: 14px;
-  background-color: #007bff;
-  border: none;
-  color: white;
-  font-size: 18px;
-  border-radius: 6px;
-  cursor: pointer;
-  margin-top: 15px;
-}
-
-.btn-primary:hover {
-  background-color: #0056b3;
-}
-
-/* Links for password reset and register */
-.footer-links {
-  text-align: center;
-  margin-top: 25px;
-}
-
-.btn-link {
-  background: none;
-  border: none;
-  color: #007bff;
-  cursor: pointer;
-  font-size: 16px;
-  text-decoration: none;
-}
-
-.btn-link:hover {
-  text-decoration: underline;
-}
-
-/* PopUp */
-/* Modal Overlay */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5); /* Dark background with transparency */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 999;
-}
-
-/* Modal Content */
-.modal-content {
-  background-color: #fff;
-  padding: 20px;
-  border-radius: 10px;
-  max-width: 400px;
-  text-align: center;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-  position: relative;
-}
-
-/* Button Inside Modal */
-.modal-content button {
-  margin-top: 15px;
-  padding: 10px 20px;
-}
-</style>
