@@ -52,9 +52,9 @@ func GetUsers(db *sql.DB) ([]User, error) {
 }
 
 // CheckIfRegistered checks if a user is registered and if yes, the password: Password match: 202; Password mismatch: 403; Unregistered: 404
-func CheckIfRegistered(email string, password string, db *sql.DB) (int, error) {
+func CheckIfRegistered(email string, password string, db *sql.DB) (int, int, error) {
 	var (
-		execSQL = fmt.Sprintf(`SELECT password FROM showmaster.users WHERE email='%s';`, email)
+		execSQL = fmt.Sprintf(`SELECT password, permlvl FROM showmaster.users WHERE email='%s';`, email)
 		err     error
 	)
 
@@ -62,25 +62,26 @@ func CheckIfRegistered(email string, password string, db *sql.DB) (int, error) {
 	if err != nil {
 		log.SetFlags(log.LstdFlags | log.Lshortfile)
 		log.Printf("Error querying user rows: %d\n", err)
-		return 0, err
+		return 0, 0, err
 	}
 	defer rows.Close()
 
 	for rows.Next() {
 		var pwd string
-		err = rows.Scan(&pwd)
+		var permlvl int
+		err = rows.Scan(&pwd, &permlvl)
 		if err != nil {
 			log.SetFlags(log.LstdFlags | log.Lshortfile)
 			log.Printf("Error scanning over user rows: %d\n", err)
-			return 0, err
+			return 0, 0, err
 		}
 		if password != pwd {
-			return 0, nil
+			return 0, 0, nil
 		} else {
-			return 1, nil
+			return 1, permlvl, nil
 		}
 	}
-	return 2, nil
+	return 2, 0, nil
 }
 
 // NewUser creates a user, needs the user struct from this package

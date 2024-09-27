@@ -25,10 +25,14 @@ func main() {
 	defer DB.Close()         // Close the DB on shutdown
 
 	// Cache
-	util.CacheProjects(DB)               // Initial cache of projects
-	util.CacheUsers(DB)                  // Initial cache of users
-	util.CacheTables(DB)                 // Initial Cache of all projects
-	util.CreateInitialAdminUser(DB, CFG) // Creates the initial admin user from the docker compose file values
+	util.CacheProjects(DB)                      // Initial cache of projects
+	util.CacheUsers(DB)                         // Initial cache of users
+	util.CacheTables(DB)                        // Initial Cache of all projects
+	err := util.CreateInitialAdminUser(DB, CFG) // Creates the initial admin user from the docker compose file values
+	if err != nil {
+		log.SetFlags(log.LstdFlags | log.Lshortfile)
+		log.Printf("Error creating initial admin user: %v", err)
+	}
 
 	// Web
 	web.InitWeb(DB, CFG)

@@ -2,26 +2,36 @@ package util
 
 import (
 	"database/sql"
+	"errors"
+	"fmt"
 	"log"
 	"showmaster/src/config"
-	"showmaster/src/database"
 )
 
-func CreateInitialAdminUser(db *sql.DB, cfg *config.CFG) {
+func CreateInitialAdminUser(db *sql.DB, cfg *config.CFG) error {
 	var (
-		permlvl = 3
-		u       = database.User{
-			Name:            cfg.User.AdminUserName,
-			Email:           "admin@example.com",
-			Password:        cfg.User.AdminPassword,
-			PermissionLevel: &permlvl,
-		}
+		execSQL = fmt.Sprintf(`INSERT INTO showmaster.users (name, email, password, permlvl) VALUES ('%s', 'admin@example.com', '%s', '3');`,
+			cfg.User.AdminUserName, cfg.User.AdminPassword)
 
 		err error
 	)
-	err = database.NewUser(u, db)
+
+	for _, user := range USERS {
+		if user == cfg.User.AdminUserName {
+			err = errors.New("user already exists")
+			return err
+		} else {
+			continue
+		}
+	}
+
+	_, err = db.Exec(execSQL)
 	if err != nil {
 		log.SetFlags(log.LstdFlags | log.Lshortfile)
-		log.Printf("Error creating admin user: %d\n", err)
+		log.Printf("Error creating initial admin user: %d\n", err)
+		return err
 	}
+
+	CacheUsers(db)
+	return nil
 }

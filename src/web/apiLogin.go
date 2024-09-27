@@ -15,7 +15,7 @@ type userLoginData struct {
 func (a *API) login(c *fiber.Ctx) error {
 	var (
 		data userLoginData
-		i    int
+		i, p int
 		err  error
 	)
 
@@ -25,7 +25,7 @@ func (a *API) login(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON("")
 	}
 
-	i, err = database.CheckIfRegistered(data.Email, data.Password, a.DB)
+	i, p, err = database.CheckIfRegistered(data.Email, data.Password, a.DB)
 	if err != nil {
 		log.SetFlags(log.LstdFlags | log.Lshortfile)
 		log.Printf("Error checking if user is registered")
@@ -36,7 +36,7 @@ func (a *API) login(c *fiber.Ctx) error {
 	case 0:
 		return c.Status(fiber.StatusForbidden).JSON("")
 	case 1:
-		return c.Status(fiber.StatusAccepted).JSON("")
+		return c.Status(fiber.StatusAccepted).JSON(p)
 	case 2:
 		return c.Status(fiber.StatusNotFound).JSON("")
 	}

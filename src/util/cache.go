@@ -87,7 +87,7 @@ func CacheProjects(db *sql.DB) {
 func CacheTables(db *sql.DB) {
 	type d2 struct {
 		Table string
-		Timer float64
+		Timer *float64
 	}
 
 	var (
@@ -119,7 +119,9 @@ func CacheTables(db *sql.DB) {
 		d.Table = p.Table
 		d.HighlightedRow = 0
 		d.Timer = *NewStopwatch()
-		d.Timer.SetElapsedSeconds(p.Timer)
+		if !(p.Timer == nil) {
+			d.Timer.SetElapsedSeconds(*p.Timer)
+		}
 
 		TABLES = append(TABLES, d)
 	}

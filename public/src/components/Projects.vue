@@ -1,52 +1,57 @@
-<script>
-import { ref } from 'vue'
-import axios from 'axios'
+<script setup>
+  import axios from 'axios'
+  import { onMounted, ref, watch } from 'vue'
 
-export default {
-  name: "Projects",
-  setup() {
-    const informationPopUp = ref(false)
-    const informationMessage = ref("")
+  const props = defineProps([
+    'reload'
+  ]);
+  let rl = ref(false);
+  rl.value = props.reload.value;
+  let projects = ref([]);
 
-    const openInformationPopUp = () => {
-      informationPopUp.value = true;
-    }
+  const informationPopUp = ref(false);
+  const informationMessage = ref("");
+  const closeInformationPopUp = () => {
+    informationPopUp.value = false;
+  }
 
-    const closeInformationPopUp = () => {
-      informationPopUp.value = false;
-    }
-
-    const projects = ref([])
-
+  onMounted(() => {
     axios
       .get('/api/getprojects')
-      .then((res) => {
-        console.log(res.status);
+      .then(res => {
         projects.value = res.data;
       })
-      .catch((err) => {
+      .catch((error) => {
+        console.log(error);
         informationPopUp.value = true;
-        informationMessage.value = "Something went wrong";
-        console.log(err)
-      });
+        informationMessage.value = "Failed to get projects";
+      })
+  })
 
-    return {
-      informationPopUp,
-      informationMessage,
-      openInformationPopUp,
-      closeInformationPopUp,
+  watch(rl.value, () => {
+      console.log("reload changed");
+      getProjects();
+  })
 
-      projects,
-    }
-  },
-}
+  function getProjects() {
+    axios
+      .get('/api/getprojects')
+      .then(res => {
+        projects.value = res.data;
+      })
+      .catch((error) => {
+        console.log(error);
+        informationPopUp.value = true;
+        informationMessage.value = "Failed to get projects";
+      })
+  }
 </script>
 
 <template>
   <div class="page-container-projects">
 
     <!-- Project Renderer -->
-    <div class="projects-grid">
+    <div class="projects-grid" id="projects-grid">
       <div v-for="project in projects" :key="project.id">
         <div class="project-container">
           <div class="project-box">

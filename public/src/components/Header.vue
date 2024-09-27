@@ -1,26 +1,15 @@
-<script>
-import router from '@/router/index.js'
+<script setup>
+  import router from '@/router/index.js'
 
-let project = "";
-let renderLogout = false;
-export default {
-  name: 'Header',
-  props: {
-    project,
-    renderLogout,
-  },
-  setup() {
-    const logout = () => {
-      localStorage.clear();
-      router.push("/")
-    }
+  defineProps([
+    'renderLogout',
+    'project'
+  ]);
 
-    return {
-      logout,
-    }
-  },
-}
-
+  const logout = () => {
+    localStorage.clear();
+    router.push('/');
+  };
 </script>
 
 <template>
@@ -33,10 +22,30 @@ export default {
   </div>
 </template>
 
-<style scoped>
+<style>
+.header {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  max-width: 450px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  text-align: center;
+  position: fixed; top: 20px; left: 20px;
+}
+
+.header-title {
+  text-align: center;
+  font-size: 24px;
+  font-weight: bold;
+  color: #007bff;
+}
+
 .logout-container {
   display: flex;
-  position: absolute; top: 20px; right: 20px;
+  position: fixed; top: 20px; right: 20px;
 }
 
 .logoutButton {

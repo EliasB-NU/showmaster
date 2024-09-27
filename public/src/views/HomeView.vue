@@ -1,77 +1,90 @@
-<script>
+<script setup>
+import Projects from '@/components/Projects.vue'
 import Header from '@/components/Header.vue'
 import Footer from '@/components/Footer.vue'
-import { ref } from 'vue'
-import Projects from '@/components/Projects.vue'
+import { onMounted, ref } from 'vue'
 import axios from 'axios'
 
-export default {
-  name: "HomeView",
-  components: { Projects, Footer, Header },
-  setup () {
-    const informationPopUp = ref(false)
-    const informationMessage = ref("")
+// Message PopUp
+const informationPopUp = ref(false);
+const informationMessage = ref("");
 
-    const openInformationPopUp = () => {
-      informationPopUp.value = true;
-    }
-
-    const closeInformationPopUp = () => {
-      informationPopUp.value = false;
-    }
-
-
-    const newProjectPopUp = ref(false)
-    const name = ref("")
-
-    const openNewProjectPopUp = () => {
-      newProjectPopUp.value = true;
-    }
-
-    const newProject = () =>  {
-      axios
-        .post('/api/newproject', {
-          name: name.value,
-          creator: String(localStorage.getItem('email')),
-        })
-        .then(() => {
-          newProjectPopUp.value = false;
-          informationPopUp.value = true;
-          informationMessage.value = "Successfully Created new Project";
-        })
-        .catch((error) => {
-          console.log(error)
-          informationPopUp.value = true;
-          informationMessage.value = "Creation Failed";
-        })
-    }
-
-    const closeNewProjectPopUp = () => {
-      newProjectPopUp.value = false;
-    }
-
-    return {
-      informationPopUp,
-      informationMessage,
-      openInformationPopUp,
-      closeInformationPopUp,
-
-      newProject,
-      newProjectPopUp,
-      openNewProjectPopUp,
-      closeNewProjectPopUp,
-      name,
-    }
-  }
+const closeInformationPopUp = () => {
+  informationPopUp.value = false;
 }
+
+// Initial checks
+const loadContent = ref(false);
+const loadNewProjects = ref(false);
+
+onMounted(() => {
+  switch (localStorage.getItem('permlvl')) {
+    case '0':
+      informationPopUp.value = true;
+      informationMessage.value = "You currently don't have any permissions, please contact site admin.";
+      break;
+    case '1':
+      loadContent.value = true;
+      break;
+    case '2':
+      loadContent.value = true;
+      loadNewProjects.value = true;
+      break;
+    case '3':
+      loadContent.value = true;
+      loadNewProjects.value = true;
+      break;
+    default:
+      informationPopUp.value = true;
+      informationMessage.value = "Error loading permissions, please login again.";
+      break;
+  }
+})
+
+// Logic for new project
+const newProjectPopUp = ref(false);
+const name = ref("")
+const rl = ref(false)
+
+const newProject = () => {
+  axios
+    .post('/api/newproject', {
+      name: name.value,
+      creator: String(localStorage.getItem('email')),
+    })
+    .then(() => {
+      newProjectPopUp.value = false;
+      informationPopUp.value = true;
+      informationMessage.value = "Successfully Created new Project";
+      rl.value = !rl.value;
+    })
+    .catch((error) => {
+      console.log(error)
+      informationPopUp.value = true;
+      informationMessage.value = "Creation Failed";
+    })
+}
+
+const openNewProjectPopUp = () => {
+  newProjectPopUp.value = true;
+}
+
+const closeNewProjectPopUp = () => {
+  newProjectPopUp.value = false;
+}
+
 </script>
 
 <template>
   <div class="page-container">
-    <Header project=" | Projects" render-logout=true />
+    <div class="header-container">
+      <Header project=" |  Projects" render-logout=true />
+    </div>
 
     <!-- Projects -->
-    <Projects />
+    <div v-if="loadContent">
+      <Projects reload="{{ rl.value }}" />
+    </div>
 
     <!-- NewProject PopUp -->
     <div v-if="newProjectPopUp" class="modal-overlay">
@@ -106,10 +119,13 @@ export default {
     </div>
 
     <!-- New Project -->
-    <div class="newProject-container">
+    <div class="newProject-container" v-if="loadNewProjects">
       <b class="newProject-Button" @click="openNewProjectPopUp"><div class="circle"></div></b>
     </div>
-    <Footer />
+
+    <div class="footer-container">
+      <Footer />
+    </div>
   </div>
 </template>
 
@@ -126,11 +142,21 @@ export default {
   box-sizing: border-box;
 }
 
+.header-container {
+  padding: 40px;
+  z-index: 1000;
+}
+
+.footer-container {
+  padding: 40px;
+  z-index: 1000;
+}
+
 .newProject-container {
   display: flex;
-  position: absolute; bottom: 20px; right: 20px;
-  align-items: center;
-  justify-content: center;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
 }
 
 .circle {
