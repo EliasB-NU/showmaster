@@ -109,7 +109,7 @@ func InitWeb(db *sql.DB, cfg *config.CFG) {
 	api.Patch("/admin/updateuser", a.updateUser)        // Update the permission level of a user | <- incoming
 	api.Delete("/admin/deleteuser", a.deleteUser)       // Delete a user | <- incoming
 	api.Delete("/admin/deleteproject", a.deleteProject) // Delete a project | <- incoming
-	// Tables
+	// Projects
 	api.Get("/getprojects", a.getProjects)       // Get tables | -> outgoing
 	api.Post("/newproject", a.newProject)        // New table | <- incoming
 	api.Patch("/updateproject", a.updateProject) // Update table | <- incoming

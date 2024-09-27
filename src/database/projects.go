@@ -5,17 +5,19 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"strings"
 )
 
 type Project struct {
-	Name    string `json:"name"`
-	Table   string `json:"table"`
-	Creator string `json:"creator"`
+	Name    string   `json:"name"`
+	Table   string   `json:"table"`
+	Creator string   `json:"creator"`
+	Timer   *float64 `json:"timer"`
 }
 
 func GetProjects(db *sql.DB) ([]Project, error) {
 	var (
-		execSQL = fmt.Sprintf(`SELECT * FROM showmaster.projects`)
+		execSQL = fmt.Sprintf(`SELECT name, projecttable, creator, timer FROM showmaster.projects`)
 
 		projects []Project
 		err      error
@@ -37,7 +39,7 @@ func GetProjects(db *sql.DB) ([]Project, error) {
 
 	for rows.Next() {
 		var project Project
-		err = rows.Scan(&project.Name, &project.Table, &project.Creator)
+		err = rows.Scan(&project.Name, &project.Table, &project.Creator, &project.Timer)
 		if err != nil {
 			log.SetFlags(log.LstdFlags | log.Lshortfile)
 			log.Printf("Error scanning rows: %d\n", err)
@@ -51,8 +53,11 @@ func GetProjects(db *sql.DB) ([]Project, error) {
 
 func NewProject(name string, creator string, db *sql.DB) error {
 	var (
+		tableNameFirstStep = strings.ReplaceAll(name, " ", "_")
+		tableName          = strings.ToLower(tableNameFirstStep)
+
 		execSqlProjectRow = fmt.Sprintf(`
-			INSERT INTO showmaster.projects (name, projecttable, creator) VALUES ('%s', '%s','%s');`, name, name+"table", creator)
+			INSERT INTO showmaster.projects (name, projecttable, creator) VALUES ('%s', '%s','%s');`, name, tableName+"table", creator)
 
 		execSqlProjectTable = fmt.Sprintf(`
 			CREATE TABLE IF NOT EXISTS showmaster.%s (
@@ -64,7 +69,7 @@ func NewProject(name string, creator string, db *sql.DB) error {
 			    pptx TEXT,
 			    notes TEXT,
 			    timer interval
-			);`, name+"table")
+			);`, tableName+"table")
 
 		err error
 	)
