@@ -1,4 +1,4 @@
-# ShowMaster - V3 (W.I.P. | latest stable version V2.3.1 (read readme in the v2.3.1 branch))
+# ShowMaster - V3 (W.I.P. | latest stable version V2.3.2 (read readme in the v2.3.2 branch))
 
 This is a cross-platform/browser synced list of scenes for your local event.  
   
