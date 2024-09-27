@@ -3,9 +3,9 @@
 </script>
 
 <template>
-  <RouterView />
+  <h1>Hello Admins</h1>
 </template>
 
-<style>
+<style scoped>
 
 </style>

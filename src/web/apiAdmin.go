@@ -12,7 +12,7 @@ func (a *API) getUsers(c *fiber.Ctx) error {
 	if err != nil {
 		log.SetFlags(log.LstdFlags | log.Lshortfile)
 		log.Printf("Error getting users: %d\n", err)
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{})
+		return c.Status(fiber.StatusInternalServerError).JSON("")
 	}
 
 	return c.Status(fiber.StatusOK).JSON(users)
@@ -39,11 +39,11 @@ func (a *API) updateUser(c *fiber.Ctx) error {
 	if err != nil {
 		log.SetFlags(log.LstdFlags | log.Lshortfile)
 		log.Printf("Error updating user: %d\n", err)
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{})
+		return c.Status(fiber.StatusInternalServerError).JSON("")
 	}
 
 	util.CacheUsers(a.DB)
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{})
+	return c.Status(fiber.StatusOK).JSON("")
 }
 
 type deleteStruct struct {
@@ -59,14 +59,14 @@ func (a *API) deleteUser(c *fiber.Ctx) error {
 	if err := c.BodyParser(&data); err != nil {
 		log.SetFlags(log.LstdFlags | log.Lshortfile)
 		log.Printf("Error parsing json: %d\n", err)
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{})
+		return c.Status(fiber.StatusBadRequest).JSON("")
 	}
 
 	err = database.DeleteUser(data.Name, a.DB)
 	if err != nil {
 		log.SetFlags(log.LstdFlags | log.Lshortfile)
 		log.Printf("Error deleting user: %d\n", err)
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{})
+		return c.Status(fiber.StatusInternalServerError).JSON("")
 	}
 
 	util.CacheUsers(a.DB)
@@ -82,16 +82,16 @@ func (a *API) deleteProject(c *fiber.Ctx) error {
 	if err := c.BodyParser(&data); err != nil {
 		log.SetFlags(log.LstdFlags | log.Lshortfile)
 		log.Printf("Error parsing json: %d\n", err)
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{})
+		return c.Status(fiber.StatusBadRequest).JSON("")
 	}
 
 	err = database.DeleteProject(data.Name, a.DB)
 	if err != nil {
 		log.SetFlags(log.LstdFlags | log.Lshortfile)
 		log.Printf("Error deleting project: %d\n", err)
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{})
+		return c.Status(fiber.StatusInternalServerError).JSON("")
 	}
 
 	util.CacheProjects(a.DB)
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{})
+	return c.Status(fiber.StatusOK).JSON("")
 }

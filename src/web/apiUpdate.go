@@ -9,7 +9,6 @@ import (
 	"showmaster/src/database"
 	"showmaster/src/util"
 	"strings"
-	"time"
 )
 
 // Errors
@@ -27,14 +26,14 @@ func (a *API) getHighlightedRow(c *fiber.Ctx) error {
 	if project == "" {
 		log.SetFlags(log.LstdFlags | log.Lshortfile)
 		log.Println("Request without project link ...")
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{})
+		return c.Status(fiber.StatusBadRequest).JSON("")
 	}
 
 	p, err := findProject(project)
 	if errors.Is(err, projectNotFound) {
 		log.SetFlags(log.LstdFlags | log.Lshortfile)
 		log.Println("Request with invalid project link ...")
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{})
+		return c.Status(fiber.StatusBadRequest).JSON("")
 	}
 
 	return c.Status(fiber.StatusOK).JSON(p.HighlightedRow)
@@ -56,21 +55,21 @@ func (a *API) updateHighlightedRow(c *fiber.Ctx) error {
 	if project == "" {
 		log.SetFlags(log.LstdFlags | log.Lshortfile)
 		log.Println("Request without project link ...")
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{})
+		return c.Status(fiber.StatusBadRequest).JSON("")
 	}
 
 	p, err := findProject(project)
 	if errors.Is(err, projectNotFound) {
 		log.SetFlags(log.LstdFlags | log.Lshortfile)
 		log.Println("Request with invalid project link ...")
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{})
+		return c.Status(fiber.StatusBadRequest).JSON("")
 	}
 
 	err = c.BodyParser(&data)
 	if err != nil {
 		log.SetFlags(log.LstdFlags | log.Lshortfile)
 		log.Printf("Error parsting body: %d\n", err)
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{})
+		return c.Status(fiber.StatusBadRequest).JSON("")
 	}
 
 	p.HighlightedRow = data
@@ -81,7 +80,7 @@ func (a *API) updateHighlightedRow(c *fiber.Ctx) error {
 	if err != nil {
 		log.SetFlags(log.LstdFlags | log.Lshortfile)
 		log.Printf("Error marshalling data: %d\n", err)
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{})
+		return c.Status(fiber.StatusInternalServerError).JSON("")
 	}
 	SendMessage(bytes)
 
@@ -90,8 +89,8 @@ func (a *API) updateHighlightedRow(c *fiber.Ctx) error {
 
 func (a *API) getTimer(c *fiber.Ctx) error {
 	type msg struct {
-		Status bool          `json:"status"`
-		Timer  time.Duration `json:"timer"`
+		Status bool    `json:"status"`
+		Timer  float64 `json:"timer"`
 	}
 	var (
 		urlValue   = utils.CopyString(c.Params("project"))
@@ -103,14 +102,14 @@ func (a *API) getTimer(c *fiber.Ctx) error {
 	if project == "" {
 		log.SetFlags(log.LstdFlags | log.Lshortfile)
 		log.Println("Request without project link ...")
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{})
+		return c.Status(fiber.StatusBadRequest).JSON("")
 	}
 
 	p, err := findProject(project)
 	if errors.Is(err, projectNotFound) {
 		log.SetFlags(log.LstdFlags | log.Lshortfile)
 		log.Println("Request with invalid project link ...")
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{})
+		return c.Status(fiber.StatusBadRequest).JSON("")
 	}
 
 	data.Status = p.Timer.Running
@@ -135,21 +134,21 @@ func (a *API) updateTimer(c *fiber.Ctx) error {
 	if project == "" {
 		log.SetFlags(log.LstdFlags | log.Lshortfile)
 		log.Println("Request without project link ...")
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{})
+		return c.Status(fiber.StatusBadRequest).JSON("")
 	}
 
 	p, err := findProject(project)
 	if errors.Is(err, projectNotFound) {
 		log.SetFlags(log.LstdFlags | log.Lshortfile)
 		log.Println("Request with invalid project link ...")
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{})
+		return c.Status(fiber.StatusBadRequest).JSON("")
 	}
 
 	err = c.BodyParser(&data)
 	if err != nil {
 		log.SetFlags(log.LstdFlags | log.Lshortfile)
 		log.Printf("Error parsing body: %d\n", err)
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{})
+		return c.Status(fiber.StatusBadRequest).JSON("")
 	}
 
 	switch data {
@@ -168,7 +167,7 @@ func (a *API) updateTimer(c *fiber.Ctx) error {
 		if err != nil {
 			log.SetFlags(log.LstdFlags | log.Lshortfile)
 			log.Printf("Error updating timer: %d\n", err)
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{})
+			return c.Status(fiber.StatusInternalServerError).JSON("")
 		}
 	case "reset":
 		p.Timer.Reset()
@@ -176,7 +175,7 @@ func (a *API) updateTimer(c *fiber.Ctx) error {
 		if err != nil {
 			log.SetFlags(log.LstdFlags | log.Lshortfile)
 			log.Printf("Error updating timer: %d\n", err)
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{})
+			return c.Status(fiber.StatusInternalServerError).JSON("")
 		}
 		msg.TimerStatus = "reset"
 	default:
@@ -191,7 +190,7 @@ func (a *API) updateTimer(c *fiber.Ctx) error {
 	if err != nil {
 		log.SetFlags(log.LstdFlags | log.Lshortfile)
 		log.Printf("Error marshalling data: %s\n", err)
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{})
+		return c.Status(fiber.StatusInternalServerError).JSON("")
 	}
 	SendMessage(bytes)
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{})

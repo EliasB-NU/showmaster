@@ -9,11 +9,12 @@ import (
 
 func CreateInitialAdminUser(db *sql.DB, cfg *config.CFG) {
 	var (
-		u = database.User{
+		permlvl = 3
+		u       = database.User{
 			Name:            cfg.User.AdminUserName,
 			Email:           "admin@example.com",
 			Password:        cfg.User.AdminPassword,
-			PermissionLevel: 3,
+			PermissionLevel: &permlvl,
 		}
 
 		err error

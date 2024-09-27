@@ -1,35 +1,42 @@
-@import './base.css';
+/* Global CSS */
 
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  font-weight: normal;
-}
-
-a,
-.green {
-  text-decoration: none;
-  color: hsla(160, 100%, 37%, 1);
-  transition: 0.4s;
-  padding: 3px;
-}
-
-@media (hover: hover) {
-  a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
-  }
-}
-
-@media (min-width: 1024px) {
-  body {
+.header, .footer {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    max-width: 450px;
+    margin-bottom: 10px;
     display: flex;
-    place-items: center;
-  }
+    justify-content: space-between;
+    text-align: center;
+}
 
-  #app {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 0 2rem;
-  }
+.header {
+    min-width: 200px;
+}
+
+.footer {
+    min-width: 350px;
+}
+
+.header-title {
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    color: #007bff;
+}
+
+.footer span {
+    font-size: 14px;
+    color: #555;
+}
+
+.footer-link {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.footer-link:hover {
+    text-decoration: underline;
 }

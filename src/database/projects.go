@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"time"
 )
 
 type Project struct {
@@ -137,7 +136,7 @@ func DeleteProject(name string, db *sql.DB) error {
 }
 
 // UpdateTimer updates the time stored in the db
-func UpdateTimer(t time.Duration, name string, db *sql.DB) error {
+func UpdateTimer(t float64, name string, db *sql.DB) error {
 	var (
 		execSQL = fmt.Sprintf(`UPDATE showmaster.projects SET timer= '%d' WHERE name = '%s'`, t, name)
 		err     error
@@ -154,14 +153,14 @@ func UpdateTimer(t time.Duration, name string, db *sql.DB) error {
 
 // Row the row used by the individual projects
 type Row struct {
-	Id    int            `json:"id"`
-	Pos   float32        `json:"pos"`
-	Name  string         `json:"name"`
-	Audio *string        `json:"audio"`
-	Light *string        `json:"light"`
-	PPTX  *string        `json:"pptx"`
-	Notes *string        `json:"notes"`
-	Timer *time.Duration `json:"timer"`
+	Id    int      `json:"id"`
+	Pos   float32  `json:"pos"`
+	Name  string   `json:"name"`
+	Audio *string  `json:"audio"`
+	Light *string  `json:"light"`
+	PPTX  *string  `json:"pptx"`
+	Notes *string  `json:"notes"`
+	Timer *float64 `json:"timer"`
 }
 
 // GetRows Get all the rows from a project

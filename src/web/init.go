@@ -50,6 +50,7 @@ func InitWeb(db *sql.DB, cfg *config.CFG) {
 
 			AllowHeaders: strings.Join([]string{
 				"application/json",
+				"Access-Control-Allow-Headers",
 			}, ","),
 
 			AllowCredentials: false,
@@ -124,7 +125,7 @@ func InitWeb(db *sql.DB, cfg *config.CFG) {
 	api.Patch("/updatetimer:project", a.updateTimer)                   // Update the timer status (update sent to clients via websocket) | <- incoming
 
 	// Frontend
-	app.Static("/", "./public")
+	app.Static("/", cfg.Website.Files)
 
 	// Start fiber
 	log.Println("Started ShowMaster V3")

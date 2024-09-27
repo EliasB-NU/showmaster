@@ -22,8 +22,9 @@ type CFG struct {
 	} `json:"User"`
 
 	Website struct {
-		Host string `json:"Host"`
-		Port int    `json:"Port"`
+		Host  string `json:"Host"`
+		Port  int    `json:"Port"`
+		Files string
 	}
 }
 
@@ -40,6 +41,7 @@ func GetConfig() *CFG {
 		c.User.AdminPassword = os.Getenv("AdminPassword")
 		c.Website.Host = "0.0.0.0"
 		c.Website.Port = 80
+		c.Website.Files = "public/"
 
 		return &c
 	} else if os.Args[1] == "dev" {
@@ -58,6 +60,7 @@ func GetConfig() *CFG {
 			log.SetFlags(log.LstdFlags & log.Lshortfile)
 			log.Fatalf("Error readeing config file: %d\n", err)
 		}
+		config.Website.Files = "public/dist/"
 
 		return &config
 	} else {

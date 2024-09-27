@@ -28,19 +28,19 @@ func (a *API) newProject(c *fiber.Ctx) error {
 	if err != nil {
 		log.SetFlags(log.LstdFlags | log.Lshortfile)
 		log.Printf("Error parsing request: %d\n", err)
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{})
+		return c.Status(fiber.StatusBadRequest).JSON("")
 	}
 
 	err = database.NewProject(data.Name, data.Creator, a.DB)
 	if err != nil {
 		log.SetFlags(log.LstdFlags | log.Lshortfile)
 		log.Printf("Error creating project: %d\n", err)
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{})
+		return c.Status(fiber.StatusInternalServerError).JSON("")
 	}
 
 	util.CacheProjects(a.DB)
 	util.NewTableCache(data.Name + "table")
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{})
+	return c.Status(fiber.StatusOK).JSON("")
 }
 
 func (a *API) updateProject(c *fiber.Ctx) error {
@@ -57,16 +57,16 @@ func (a *API) updateProject(c *fiber.Ctx) error {
 	if err != nil {
 		log.SetFlags(log.LstdFlags | log.Lshortfile)
 		log.Printf("Error parsing request: %d\n", err)
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{})
+		return c.Status(fiber.StatusBadRequest).JSON("")
 	}
 
 	err = database.UpdateProject(data.OldName, data.NewName, a.DB)
 	if err != nil {
 		log.SetFlags(log.LstdFlags | log.Lshortfile)
 		log.Printf("Error updating project: %d\n", err)
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{})
+		return c.Status(fiber.StatusInternalServerError).JSON("")
 	}
 
 	util.CacheProjects(a.DB)
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{})
+	return c.Status(fiber.StatusOK).JSON("")
 }

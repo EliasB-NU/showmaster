@@ -22,24 +22,24 @@ func (a *API) login(c *fiber.Ctx) error {
 	if err := c.BodyParser(&data); err != nil {
 		log.SetFlags(log.LstdFlags | log.Lshortfile)
 		log.Printf("Error parsing data: %d\n", err)
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{})
+		return c.Status(fiber.StatusBadRequest).JSON("")
 	}
 
 	i, err = database.CheckIfRegistered(data.Email, data.Password, a.DB)
 	if err != nil {
 		log.SetFlags(log.LstdFlags | log.Lshortfile)
 		log.Printf("Error checking if user is registered")
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{})
+		return c.Status(fiber.StatusInternalServerError).JSON("")
 	}
 
 	switch i {
 	case 0:
-		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{})
+		return c.Status(fiber.StatusForbidden).JSON("")
 	case 1:
-		return c.Status(fiber.StatusAccepted).JSON(fiber.Map{})
+		return c.Status(fiber.StatusAccepted).JSON("")
 	case 2:
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{})
+		return c.Status(fiber.StatusNotFound).JSON("")
 	}
 
-	return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{})
+	return c.Status(fiber.StatusBadRequest).JSON("")
 }

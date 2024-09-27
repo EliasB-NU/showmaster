@@ -5,7 +5,7 @@ import (
 )
 
 func checkAuth(c *fiber.Ctx) bool {
-	toCheck := [6]string{"/monitor", "/api/admin/getusers", "/api/admin/updateuser", "/api/admin/deleteuser", "/api/admin/deleteproject"}
+	toCheck := [6]string{"/monitor", "/admin", "/api/admin/getusers", "/api/admin/updateuser", "/api/admin/deleteuser", "/api/admin/deleteproject"}
 	for _, v := range toCheck {
 		if c.OriginalURL() == v {
 			return false

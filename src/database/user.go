@@ -9,10 +9,10 @@ import (
 
 // User struct for a new user
 type User struct {
-	Name            string
-	Email           string
-	Password        string
-	PermissionLevel int
+	Name            string `json:"name"`
+	Email           string `json:"email"`
+	Password        string `json:"password"`
+	PermissionLevel *int
 }
 
 func GetUsers(db *sql.DB) ([]User, error) {

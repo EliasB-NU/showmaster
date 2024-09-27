@@ -66,7 +66,7 @@ func InitDB(cfg *config.CFG) {
 		    name TEXT,
 		    projecttable TEXT,
 		    creator TEXT,
-		    timer interval
+		    timer DOUBLE PRECISION
 		);`)
 
 	_, err = db.Exec(execSqlProjects)
