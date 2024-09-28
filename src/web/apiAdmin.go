@@ -72,26 +72,3 @@ func (a *API) deleteUser(c *fiber.Ctx) error {
 	util.CacheUsers(a.DB)
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{})
 }
-
-func (a *API) deleteProject(c *fiber.Ctx) error {
-	var (
-		data deleteStruct
-		err  error
-	)
-
-	if err := c.BodyParser(&data); err != nil {
-		log.SetFlags(log.LstdFlags | log.Lshortfile)
-		log.Printf("Error parsing json: %d\n", err)
-		return c.Status(fiber.StatusBadRequest).JSON("")
-	}
-
-	err = database.DeleteProject(data.Name, a.DB)
-	if err != nil {
-		log.SetFlags(log.LstdFlags | log.Lshortfile)
-		log.Printf("Error deleting project: %d\n", err)
-		return c.Status(fiber.StatusInternalServerError).JSON("")
-	}
-
-	util.CacheProjects(a.DB)
-	return c.Status(fiber.StatusOK).JSON("")
-}

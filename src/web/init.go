@@ -105,14 +105,14 @@ func InitWeb(db *sql.DB, cfg *config.CFG) {
 	api.Post("/login", a.login)       // Login | <- incoming
 	api.Post("/register", a.register) // Register | <- incoming
 	// Admin
-	api.Get("/admin/getusers", a.getUsers)              // Get all users | -> outgoing
-	api.Patch("/admin/updateuser", a.updateUser)        // Update the permission level of a user | <- incoming
-	api.Delete("/admin/deleteuser", a.deleteUser)       // Delete a user | <- incoming
-	api.Delete("/admin/deleteproject", a.deleteProject) // Delete a project | <- incoming
+	api.Get("/admin/getusers", a.getUsers)        // Get all users | -> outgoing
+	api.Patch("/admin/updateuser", a.updateUser)  // Update the permission level of a user | <- incoming
+	api.Delete("/admin/deleteuser", a.deleteUser) // Delete a user | <- incoming
 	// Projects
-	api.Get("/getprojects", a.getProjects)       // Get tables | -> outgoing
-	api.Post("/newproject", a.newProject)        // New table | <- incoming
-	api.Patch("/updateproject", a.updateProject) // Update table | <- incoming
+	api.Get("/getprojects", a.getProjects)        // Get tables | -> outgoing
+	api.Post("/newproject", a.newProject)         // New table | <- incoming
+	api.Patch("/updateproject", a.updateProject)  // Update table | <- incoming
+	api.Delete("/deleteproject", a.deleteProject) // Delete project | <- incoming
 	// Rows
 	api.Get("/getrows:project", a.getRows)        // Get rows | -> outgoing
 	api.Post("/newrow:project", a.newRow)         // New row | <- incoming

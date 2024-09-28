@@ -118,10 +118,38 @@ func UpdateProject(oldName string, newName string, db *sql.DB) error {
 
 func DeleteProject(name string, db *sql.DB) error {
 	var (
+		tableName    string
+		execSqlQuery = fmt.Sprintf(`SELECT projecttable FROM showmaster.projects WHERE name = '%s';`, name)
 		execSQLRow   = fmt.Sprintf(`DELETE FROM showmaster.projects WHERE name = '%s';`, name)
-		execSQLTable = fmt.Sprintf(`DROP TABLE showmaster.%s;`, name+"table")
 		err          error
 	)
+
+	rows, err := db.Query(execSqlQuery)
+	if err != nil {
+		log.SetFlags(log.LstdFlags | log.Lshortfile)
+		log.Fatalf("Error querying rows: %d\n", err)
+		return err
+	}
+	defer rows.Close()
+
+	if err := rows.Err(); err != nil {
+		log.SetFlags(log.LstdFlags | log.Lshortfile)
+		log.Printf("Error iterating over rows: %d\n", err)
+		return err
+	}
+
+	for rows.Next() {
+		var name string
+		err = rows.Scan(&name)
+		if err != nil {
+			log.SetFlags(log.LstdFlags | log.Lshortfile)
+			log.Printf("Error scanning rows: %d\n", err)
+			return err
+		}
+		tableName = name
+	}
+
+	var execSQLTable = fmt.Sprintf(`DROP TABLE showmaster.%s;`, tableName)
 
 	_, err = db.Exec(execSQLRow)
 	if err != nil {

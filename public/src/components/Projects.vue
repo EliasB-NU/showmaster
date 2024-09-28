@@ -4,7 +4,8 @@
 
   const props = defineProps([
     'reload',
-    'render',
+    'edit',
+    'delete',
   ]);
   let projects = ref([]);
 
@@ -38,6 +39,7 @@
         newname: newName.value,
       })
       .then(() => {
+        editProjectPopUp.value = false;
         informationPopUp.value = true;
         informationMessage.value = "Successfully Updated Project";
         getProjects();
@@ -58,8 +60,40 @@
     editProjectPopUp.value = false;
   }
 
+  const deleteConfirmPopUp = ref(false);
+  const projectToDelete = ref("")
+  const startDeletion = (data) => {
+    projectToDelete.value = data.name;
+    deleteConfirmPopUp.value = true;
+  }
+
+  const cancelDelete = () => {
+    deleteConfirmPopUp.value = false;
+  }
+
+  const deleteProject = () => {
+    axios
+      .delete('/api/deleteproject', {
+        data: {
+          name: projectToDelete.value,
+        }
+      })
+      .then(() => {
+        deleteConfirmPopUp.value = false;
+        informationPopUp.value = true;
+        informationMessage.value = "Successfully Deleted Project";
+        getProjects();
+      })
+      .catch((error) => {
+        console.log(error);
+        informationPopUp.value = true;
+        informationMessage.value = "Failed to delete Project";
+      })
+  }
+
   watch(
-    () => props.reload, () => {
+    () => props.reload,
+    () => {
       getProjects();
     },
     { deep: true }
@@ -90,8 +124,11 @@
             <h2 class="text-center">{{ project.name }}</h2>
             <span>Creator: {{ project.creator }}</span><br>
             <span>Timer: {{ project.timer }}</span>
-            <div v-if="render">
+            <div v-if="edit">
               <button @click="openEditProjectPopUp(project)" class="btn-primary w-100">Edit Project</button>
+            </div>
+            <div v-if="delete">
+              <button @click="startDeletion(project)" class="btn-primary w-100" style="background: red">Delete Project</button>
             </div>
           </div>
         </div>
@@ -114,11 +151,20 @@
               required
             />
           </div>
-          <button type="submit" class="btn-primary w-100">Create Project</button>
+          <button type="submit" class="btn-primary">Update Project</button>
         </form>
         <div class="footer-links">
           <button @click="closeEditProjectPopUp" class="btn-link">Cancel</button>
         </div>
+      </div>
+    </div>
+
+    <!-- Delete Confirm PopUp -->
+    <div v-if="deleteConfirmPopUp" class="modal-overlay">
+      <div class="modal-content">
+        <h2 class="text-center">DO YOU REALLY WANT TO DELETE THIS PROJECT?</h2>
+        <button @click="cancelDelete" class="btn-primary">Cancel</button>
+        <button @click="deleteProject" class="btn-primary" style="background: red">Confirm</button>
       </div>
     </div>
 
@@ -146,11 +192,11 @@
 
 .projects-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Responsive grid */
-  gap: 20px; /* Space between grid items */
-  width: 100%; /* Full width grid */
-  max-width: 1200px; /* Optional max-width to control the grid size */
-  margin: 0 auto; /* Center grid horizontally */
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .project-box {
@@ -158,7 +204,7 @@
   padding: 30px;
   border-radius: 15px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-  min-width: 300px; /* Ensure a minimum width */
+  min-width: 300px;
   margin-bottom: 15px;
 }
 

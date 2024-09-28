@@ -17,6 +17,7 @@ const closeInformationPopUp = () => {
 const loadContent = ref(false);
 const loadNewProjects = ref(false);
 const loadEditProjects = ref(false);
+const loadDeleteProjects = ref(false);
 
 onMounted(() => {
   switch (localStorage.getItem('permlvl')) {
@@ -36,6 +37,7 @@ onMounted(() => {
       loadContent.value = true;
       loadNewProjects.value = true;
       loadEditProjects.value = true;
+      loadDeleteProjects.value = true;
       break;
     default:
       informationPopUp.value = true;
@@ -87,7 +89,7 @@ const closeNewProjectPopUp = () => {
 
     <!-- Projects -->
     <div v-if="loadContent">
-      <Projects :reload="rl" :render="loadEditProjects" />
+      <Projects :reload="rl" :edit="loadEditProjects" :delete="loadDeleteProjects" />
     </div>
 
     <!-- NewProject PopUp -->

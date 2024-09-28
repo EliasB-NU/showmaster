@@ -143,7 +143,7 @@ const closeReqPopUp = () => {
           </div>
           <button type="submit" class="btn-primary w-100">Login</button>
         </form>
-        <div class="footer-links">
+        <div class="footer-links" style="margin-top: 20px">
           <button @click="adminSite" class="btn-link">Admin Site</button>
           <button @click="openReqPopUp" class="btn-link">Register</button>
         </div>
