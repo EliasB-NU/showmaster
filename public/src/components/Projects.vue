@@ -3,10 +3,8 @@
   import { onMounted, ref, watch } from 'vue'
 
   const props = defineProps([
-    'reload'
+    'reload',
   ]);
-  let rl = ref(false);
-  rl.value = props.reload.value;
   let projects = ref([]);
 
   const informationPopUp = ref(false);
@@ -28,10 +26,12 @@
       })
   })
 
-  watch(rl.value, () => {
-      console.log("reload changed");
+  watch(
+    () => props.reload, () => {
       getProjects();
-  })
+    },
+    { deep: true }
+  )
 
   function getProjects() {
     axios

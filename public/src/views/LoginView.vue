@@ -1,4 +1,6 @@
 <script setup>
+import Header from '@/components/Header.vue'
+import Footer from '@/components/Footer.vue'
 import { onMounted, ref } from 'vue'
 import router from '@/router/index.js'
 import axios from 'axios'

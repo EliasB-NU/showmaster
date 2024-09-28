@@ -57,6 +57,7 @@ const newProject = () => {
       informationPopUp.value = true;
       informationMessage.value = "Successfully Created new Project";
       rl.value = !rl.value;
+      name.value = "";
     })
     .catch((error) => {
       console.log(error)
@@ -83,7 +84,7 @@ const closeNewProjectPopUp = () => {
 
     <!-- Projects -->
     <div v-if="loadContent">
-      <Projects reload="{{ rl.value }}" />
+      <Projects :reload="rl" />
     </div>
 
     <!-- NewProject PopUp -->
