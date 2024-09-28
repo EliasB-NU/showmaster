@@ -4,6 +4,7 @@
 
   const props = defineProps([
     'reload',
+    'render',
   ]);
   let projects = ref([]);
 
@@ -25,6 +26,37 @@
         informationMessage.value = "Failed to get projects";
       })
   })
+
+  const editProjectPopUp = ref(false);
+  const newName = ref("");
+  const projectToEdit = ref("");
+
+  const editProject = () => {
+    axios
+      .patch('/api/updateproject', {
+        oldname: projectToEdit.value,
+        newname: newName.value,
+      })
+      .then(() => {
+        informationPopUp.value = true;
+        informationMessage.value = "Successfully Updated Project";
+        getProjects();
+      })
+      .catch((error) => {
+        informationPopUp.value = true;
+        informationMessage.value = "Failed to update project";
+        console.log(error);
+      })
+  }
+
+  const openEditProjectPopUp = (data) => {
+    projectToEdit.value = data.name;
+    editProjectPopUp.value = true;
+  }
+
+  const closeEditProjectPopUp = () => {
+    editProjectPopUp.value = false;
+  }
 
   watch(
     () => props.reload, () => {
@@ -52,13 +84,40 @@
 
     <!-- Project Renderer -->
     <div class="projects-grid" id="projects-grid">
-      <div v-for="project in projects" :key="project.id">
+      <div v-for="project in projects" :key="project.name">
         <div class="project-container">
           <div class="project-box">
             <h2 class="text-center">{{ project.name }}</h2>
             <span>Creator: {{ project.creator }}</span><br>
             <span>Timer: {{ project.timer }}</span>
+            <div v-if="render">
+              <button @click="openEditProjectPopUp(project)" class="btn-primary w-100">Edit Project</button>
+            </div>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit PopUp -->
+    <div v-if="editProjectPopUp" class="modal-overlay">
+      <div class="modal-content">
+        <h2 class="text-center">Edit Project</h2>
+        <form @submit.prevent="editProject">
+          <div class="form-group mb-3">
+            <label for="name">New Name</label>
+            <input
+              type="text"
+              v-model="newName"
+              id="email"
+              class="input-control"
+              placeholder="Enter new name"
+              required
+            />
+          </div>
+          <button type="submit" class="btn-primary w-100">Create Project</button>
+        </form>
+        <div class="footer-links">
+          <button @click="closeEditProjectPopUp" class="btn-link">Cancel</button>
         </div>
       </div>
     </div>

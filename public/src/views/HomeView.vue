@@ -16,6 +16,7 @@ const closeInformationPopUp = () => {
 // Initial checks
 const loadContent = ref(false);
 const loadNewProjects = ref(false);
+const loadEditProjects = ref(false);
 
 onMounted(() => {
   switch (localStorage.getItem('permlvl')) {
@@ -29,10 +30,12 @@ onMounted(() => {
     case '2':
       loadContent.value = true;
       loadNewProjects.value = true;
+      loadEditProjects.value = true;
       break;
     case '3':
       loadContent.value = true;
       loadNewProjects.value = true;
+      loadEditProjects.value = true;
       break;
     default:
       informationPopUp.value = true;
@@ -84,12 +87,12 @@ const closeNewProjectPopUp = () => {
 
     <!-- Projects -->
     <div v-if="loadContent">
-      <Projects :reload="rl" />
+      <Projects :reload="rl" :render="loadEditProjects" />
     </div>
 
     <!-- NewProject PopUp -->
     <div v-if="newProjectPopUp" class="modal-overlay">
-      <div class="login-box">
+      <div class="modal-content">
         <h2 class="text-center">Login</h2>
         <form @submit.prevent="newProject">
           <div class="form-group mb-3">
