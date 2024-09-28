@@ -1,6 +1,7 @@
 <script setup>
   import axios from 'axios'
   import { onMounted, ref, watch } from 'vue'
+  import router from '@/router/index.js'
 
   const props = defineProps([
     'reload',
@@ -111,6 +112,14 @@
         informationMessage.value = "Failed to get projects";
       })
   }
+
+  const projectViewRoute = (data) => {
+    const firstStep = String(data.name);
+    const secondStep = firstStep.replaceAll(" ", "_");
+    const projectName = secondStep.toLowerCase();
+
+    router.push('/project/'+projectName);
+  }
 </script>
 
 <template>
@@ -119,7 +128,7 @@
     <!-- Project Renderer -->
     <div class="projects-grid" id="projects-grid">
       <div v-for="project in projects" :key="project.name">
-        <div class="project-container">
+        <div class="project-container" @click="projectViewRoute(project)">
           <div class="project-box">
             <h2 class="text-center">{{ project.name }}</h2>
             <span>Creator: {{ project.creator }}</span><br>
@@ -211,5 +220,9 @@
 .project-container {
   display: flex;
   justify-content: center;
+}
+
+.project-container:hover {
+  cursor: pointer;
 }
 </style>

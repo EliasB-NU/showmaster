@@ -7,7 +7,7 @@ import axios from 'axios'
 
 onMounted(() => {
   if (localStorage.getItem('logedIn')) {
-    router.push('/home');
+    router.push('/projects');
   }
 })
 
@@ -34,7 +34,7 @@ const login = () => {
           localStorage.setItem('logedIn', JSON.stringify(true));
           localStorage.setItem('email', JSON.stringify(loginEmail.value));
           localStorage.setItem('permlvl', JSON.stringify(response.data));
-          router.push('/home');
+          router.push('/projects');
           break;
         default:
           loginPopUp.value = true;
@@ -144,7 +144,7 @@ const closeReqPopUp = () => {
           <button type="submit" class="btn-primary w-100">Login</button>
         </form>
         <div class="footer-links" style="margin-top: 20px">
-          <button @click="adminSite" class="btn-link">Admin Site</button>
+          <RouterLink to="/admin" class="btn-link">Admin Site</RouterLink>
           <button @click="openReqPopUp" class="btn-link">Register</button>
         </div>
       </div>
