@@ -10,7 +10,7 @@ func GetAdminUsers(db *sql.DB) map[string]string {
 	var (
 		adminUsers = make(map[string]string)
 
-		execSQL = fmt.Sprintf(`SELECT user, password FROM showmaster.users WHERE permlvl = 3`)
+		execSQL = fmt.Sprintf(`SELECT email, password FROM showmaster.users WHERE permlvl = 3`)
 
 		err error
 	)

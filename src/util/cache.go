@@ -84,7 +84,7 @@ func CacheProjects(db *sql.DB) {
 }
 
 // CacheTables caches the tables into a var stored in this file, will be called on every HighlightedRow/timer update
-func CacheTables(db *sql.DB) {
+func CacheTables(db *sql.DB) *[]ProjectCache {
 	type d2 struct {
 		Table string
 		Timer *float64
@@ -93,6 +93,7 @@ func CacheTables(db *sql.DB) {
 	var (
 		execSQL  = fmt.Sprintf(`SELECT projecttable, timer FROM showmaster.projects`)
 		projects []d2
+		t        []ProjectCache
 	)
 	rows, err := db.Query(execSQL)
 	if err != nil {
@@ -114,6 +115,9 @@ func CacheTables(db *sql.DB) {
 		}
 		projects = append(projects, n)
 	}
+
+	log.Println(projects)
+
 	for _, p := range projects {
 		var d ProjectCache
 		d.Table = p.Table
@@ -123,8 +127,9 @@ func CacheTables(db *sql.DB) {
 			d.Timer.SetElapsedSeconds(*p.Timer)
 		}
 
-		TABLES = append(TABLES, d)
+		t = append(t, d)
 	}
+	return &t
 }
 
 // NewTableCache on the creation of a new project, it caches stored values get added to the cache variable

@@ -119,6 +119,9 @@ func (a *API) getTimer(c *fiber.Ctx) error {
 }
 
 func (a *API) updateTimer(c *fiber.Ctx) error {
+	type msgIncoming struct {
+		Update string `json:"update"`
+	}
 	type returnMSG struct {
 		Table       string `json:"table"`
 		TimerStatus string `json:"timer_status"`
@@ -127,7 +130,7 @@ func (a *API) updateTimer(c *fiber.Ctx) error {
 		urlValue   = utils.CopyString(c.Params("project"))
 		project, _ = strings.CutPrefix(urlValue, ":")
 
-		data string
+		data msgIncoming
 		msg  returnMSG
 		err  error
 	)
@@ -151,8 +154,9 @@ func (a *API) updateTimer(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON("")
 	}
 
-	switch data {
+	switch data.Update {
 	case "start":
+		log.Println("Request start")
 		if p.Timer.ElapsedSeconds() != 0 {
 			p.Timer.Resume()
 			msg.TimerStatus = "start"
@@ -161,6 +165,7 @@ func (a *API) updateTimer(c *fiber.Ctx) error {
 			msg.TimerStatus = "start"
 		}
 	case "stop":
+		log.Println("Request start")
 		p.Timer.Stop()
 		msg.TimerStatus = "stop"
 		err := database.UpdateTimer(p.Timer.ElapsedSeconds(), p.Table, a.DB)
@@ -170,6 +175,7 @@ func (a *API) updateTimer(c *fiber.Ctx) error {
 			return c.Status(fiber.StatusInternalServerError).JSON("")
 		}
 	case "reset":
+		log.Println("Request reset")
 		p.Timer.Reset()
 		err := database.UpdateTimer(0, p.Table, a.DB)
 		if err != nil {
@@ -196,12 +202,12 @@ func (a *API) updateTimer(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{})
 }
 
-func findProject(project string) (util.ProjectCache, error) {
+func findProject(project string) (*util.ProjectCache, error) {
 	var dummyData util.ProjectCache
 	for _, v := range util.TABLES {
 		if v.Table == project {
-			return v, nil
+			return &v, nil
 		}
 	}
-	return dummyData, projectNotFound
+	return &dummyData, projectNotFound
 }

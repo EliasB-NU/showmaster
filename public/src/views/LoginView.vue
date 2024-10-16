@@ -62,11 +62,6 @@ const login = () => {
     });
 }
 
-const adminSite = () => {
-  router.push('/admin');
-}
-
-
 const reqPopUp  = ref(false);
 const reqEmail = ref("");
 const reqUsername  = ref("");
@@ -144,7 +139,7 @@ const closeReqPopUp = () => {
           <button type="submit" class="btn-primary w-100">Login</button>
         </form>
         <div class="footer-links" style="margin-top: 20px">
-          <RouterLink to="/admin" class="btn-link">Admin Site</RouterLink>
+          <a href="/monitor" target="_blank" class="btn-link">Monitor</a>
           <button @click="openReqPopUp" class="btn-link">Register</button>
         </div>
       </div>

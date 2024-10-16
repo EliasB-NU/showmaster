@@ -53,8 +53,10 @@ func GetProjects(db *sql.DB) ([]Project, error) {
 
 func NewProject(name string, creator string, db *sql.DB) error {
 	var (
-		tableNameFirstStep = strings.ReplaceAll(name, " ", "_")
-		tableName          = strings.ToLower(tableNameFirstStep)
+		tableNameFirstStep  = strings.ReplaceAll(name, " ", "_")
+		tableNameSecondStep = strings.ReplaceAll(tableNameFirstStep, "-", "_")
+		tableNameThirdStep  = strings.ReplaceAll(tableNameSecondStep, "+", "_")
+		tableName           = strings.ToLower(tableNameThirdStep)
 
 		execSqlProjectRow = fmt.Sprintf(`
 			INSERT INTO showmaster.projects (name, projecttable, creator) VALUES ('%s', '%s','%s');`, name, tableName+"table", creator)

@@ -1,4 +1,5 @@
 <script setup>
+  import InformationPopUp from '@/components/InformationPopUp.vue'
   import axios from 'axios'
   import { onMounted, ref, watch } from 'vue'
   import router from '@/router/index.js'
@@ -10,23 +11,11 @@
   ]);
   let projects = ref([]);
 
-  const informationPopUp = ref(false);
-  const informationMessage = ref("");
-  const closeInformationPopUp = () => {
-    informationPopUp.value = false;
-  }
+  const infoPopUp = ref(false);
+  const message = ref("");
 
   onMounted(() => {
-    axios
-      .get('/api/getprojects')
-      .then(res => {
-        projects.value = res.data;
-      })
-      .catch((error) => {
-        console.log(error);
-        informationPopUp.value = true;
-        informationMessage.value = "Failed to get projects";
-      })
+    getProjects();
   })
 
   const editProjectPopUp = ref(false);
@@ -41,13 +30,13 @@
       })
       .then(() => {
         editProjectPopUp.value = false;
-        informationPopUp.value = true;
-        informationMessage.value = "Successfully Updated Project";
+        infoPopUp.value = true;
+        message.value = "Successfully Updated Project";
         getProjects();
       })
       .catch((error) => {
-        informationPopUp.value = true;
-        informationMessage.value = "Failed to update project";
+        infoPopUp.value = true;
+        message.value = "Failed to update project";
         console.log(error);
       })
   }
@@ -81,14 +70,14 @@
       })
       .then(() => {
         deleteConfirmPopUp.value = false;
-        informationPopUp.value = true;
-        informationMessage.value = "Successfully Deleted Project";
+        infoPopUp.value = true;
+        message.value = "Successfully Deleted Project";
         getProjects();
       })
       .catch((error) => {
         console.log(error);
-        informationPopUp.value = true;
-        informationMessage.value = "Failed to delete Project";
+        infoPopUp.value = true;
+        message.value = "Failed to delete Project";
       })
   }
 
@@ -108,8 +97,8 @@
       })
       .catch((error) => {
         console.log(error);
-        informationPopUp.value = true;
-        informationMessage.value = "Failed to get projects";
+        infoPopUp.value = true;
+        message.value = "Failed to get projects";
       })
   }
 
@@ -128,11 +117,13 @@
     <!-- Project Renderer -->
     <div class="projects-grid" id="projects-grid">
       <div v-for="project in projects" :key="project.name">
-        <div class="project-container" @click="projectViewRoute(project)">
+        <div class="project-container" >
           <div class="project-box">
-            <h2 class="text-center">{{ project.name }}</h2>
-            <span>Creator: {{ project.creator }}</span><br>
-            <span>Timer: {{ project.timer }}</span>
+            <div @click="projectViewRoute(project)">
+              <h2 class="text-center">{{ project.name }}</h2>
+              <span>Creator: {{ project.creator }}</span><br>
+              <span>Timer: {{ project.timer }}</span>
+            </div>
             <div v-if="edit">
               <button @click="openEditProjectPopUp(project)" class="btn-primary w-100">Edit Project</button>
             </div>
@@ -178,12 +169,7 @@
     </div>
 
     <!-- Information PopUp -->
-    <div v-if="informationPopUp" class="modal-overlay">
-      <div class="modal-content">
-        <p>{{ informationMessage }}</p>
-        <button @click="closeInformationPopUp" class="btn-primary">Confirm</button>
-      </div>
-    </div>
+    <InformationPopUp :shown="infoPopUp" :message="message" />
   </div>
 </template>
 
