@@ -101,7 +101,9 @@ func InitWeb(cfg *config.Config, db *gorm.DB) {
 	// Websocket
 	api.Get("/ws", websocket.New(a.WebsocketConnection))
 	// Login
-
+	api.Post("/login", a.login)                      // <- Email&Password, returns new session token
+	api.Delete("/logout", a.logout)                  // <- Token, deletes session
+	api.Post("/checkLogin", a.checkIfUserIsLoggedIn) // -> Bool&Perms, checks if the session is valid and returns the users permissions
 	// Admin
 
 	// Events
