@@ -11,6 +11,7 @@ import (
 	"log"
 	"showmaster/src/config"
 	"showmaster/src/database"
+	"showmaster/src/util"
 	"strings"
 )
 
@@ -22,7 +23,7 @@ type API struct {
 	LoadedEvents map[string]bool
 }
 
-func InitWeb(cfg *config.Config, db *gorm.DB) {
+func InitWeb(cfg *config.Config, db *gorm.DB, mst *util.MST) {
 	var (
 		addrShowMaster = "0.0.0.0:3000"
 
@@ -113,6 +114,7 @@ func InitWeb(cfg *config.Config, db *gorm.DB) {
 	// Web
 	showMasterApp.Static("/", "./web/dist")
 
+	mst.ElapsedTime()
 	// Start server
 	log.Println("Started Showmaster V3")
 	err = showMasterApp.Listen(addrShowMaster)

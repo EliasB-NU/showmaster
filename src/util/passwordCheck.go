@@ -1,15 +1,19 @@
 package util
 
-import "golang.org/x/crypto/bcrypt"
+import (
+	"golang.org/x/crypto/bcrypt"
+	"log"
+)
 
-// HashPassword hashes the password using bcrypt
-func HashPassword(password string) (string, error) {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+// HashString hashes the password using bcrypt
+func HashString(key string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(key), bcrypt.DefaultCost)
 	return string(bytes), err
 }
 
-// CheckPasswordHash compares the plain password with the hashed one
-func CheckPasswordHash(password, hash string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+// CheckStringHash compares the plain password with the hashed one
+func CheckStringHash(key, hash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(key))
+	log.Printf("Error comparing password: %v\n", err)
 	return err == nil
 }

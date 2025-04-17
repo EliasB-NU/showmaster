@@ -25,7 +25,7 @@ type BrowserToken struct {
 	ID uint64 `gorm:"primaryKey"`
 
 	DeviceId string
-	Key      string
+	Key      string `gorm:"unique"`
 	UserID   uint64 `gorm:"index"`
 	User     User
 }
@@ -69,6 +69,15 @@ type SceneEntries struct {
 	Event   Event
 }
 
+type OSCServer struct {
+	gorm.Model
+	ID uint64 `gorm:"primaryKey"`
+
+	Name string
+	Host string
+	Port int
+}
+
 func InitPSQLDatabase(db *gorm.DB) error {
 	var err error
 
@@ -95,6 +104,11 @@ func InitPSQLDatabase(db *gorm.DB) error {
 	err = db.AutoMigrate(&SceneEntries{})
 	if err != nil {
 		return errors.New("failed to auto migrate scenes table: " + err.Error())
+	}
+
+	err = db.AutoMigrate(&OSCServer{})
+	if err != nil {
+		return errors.New("failed to auto migrate OSC server table: " + err.Error())
 	}
 
 	// Create initial admin user, if not exists (email: admin@example.com, username: admin, password: admin)

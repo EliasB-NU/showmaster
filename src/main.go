@@ -23,15 +23,12 @@ func main() {
 
 	// Database
 	var PSQL = database.GetPSQLDatabase(CFG)
-	go func() {
-		err := database.InitPSQLDatabase(PSQL)
-		if err != nil {
-			log.Fatal("Error initializing PSQL database: ", err)
-		}
+	err := database.InitPSQLDatabase(PSQL)
+	if err != nil {
+		log.Fatal("Error initializing PSQL database: ", err)
+	}
 
-		// Takes the longest, so time is measured here
-		mst.ElapsedTime()
-	}()
+	// Takes the longest, so time is measured here
 	database.GetRedisDatabase(CFG)
 
 	// Routines
@@ -39,5 +36,5 @@ func main() {
 	util.DeleteSoftDeletedUserKeys(PSQL)
 
 	// Web
-	web.InitWeb(CFG, PSQL)
+	web.InitWeb(CFG, PSQL, &mst)
 }

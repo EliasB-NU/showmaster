@@ -33,3 +33,6 @@ dist/
 npm-debug.log
 yarn-error.log
 
+# Local env files
+config/config.yaml
+

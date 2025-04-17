@@ -113,7 +113,7 @@ func (a *API) addUser(c *fiber.Ctx) error {
 	}
 
 	// Hash password
-	hashedPassword, err := util.HashPassword(data.Password)
+	hashedPassword, err := util.HashString(data.Password)
 	if err != nil {
 		log.Printf("Error hashing password: %v\n", err)
 		return c.Status(fiber.StatusInternalServerError).JSON("Error hashing password")
