@@ -1,7 +1,7 @@
 # Showmaster
 
 I am currently rewriting the whole project in a more modular way and
-with a new backend & web interface.
+with a new backend and web interface.
 
 Stay tuned.
 
@@ -54,7 +54,7 @@ networks:
   showmaster-network:
     external: false
 ```
-To add scenes you need to use a database tool like Datagrip or pgAdmin.
+To add scenes, you need to use a database tool like Datagrip or pgAdmin.
 There is also currently no integration with other tools, but I am working on it.
 
 ## Description
@@ -65,6 +65,7 @@ You can use the midi implementation for syncing your consoles or the OSC impleme
 
 - [ ] Midi implementation
 - [ ] OSC implementation
+- [ ] GPIO implementation
 - [ ] Web interface
 - [ ] Web API
 - [ ] Websockets

@@ -17,7 +17,7 @@ type User struct {
 	Password string
 
 	Tokens *[]BrowserToken
-	Perms  *Permission
+	Perms  *Permission `gorm:"not null"`
 }
 
 type BrowserToken struct {
@@ -25,7 +25,7 @@ type BrowserToken struct {
 	ID uint64 `gorm:"primaryKey"`
 
 	DeviceId string
-	Key      string `gorm:"unique"`
+	Token    string `gorm:"unique"`
 	UserID   uint64 `gorm:"index"`
 	User     User
 }
@@ -62,20 +62,45 @@ type SceneEntries struct {
 	gorm.Model
 	ID uint64 `gorm:"primaryKey"`
 
+	SceneID          float64
 	SceneName        string
 	SceneDescription string
+
+	Audio            string
+	AudioMidiEnabled bool
+	AudioMidiChannel int
+	AudioMidiNote    string
+	AudioOSCEnabled  bool
+	AudioOSCChannel  int
+	AudioOSCNote     string
+	Light            string
+	LightMidiEnabled bool
+	LightMidiChannel int
+	LightMidiNote    string
+	LightOSCEnabled  bool
+	LightOSCChannel  int
+	LightOSCNote     string
+	Video            string
+	VideoMidiEnabled bool
+	VideoMidiChannel int
+	VideoMidiNote    string
+	VideoOSCEnabled  bool
+	VideoOSCChannel  int
+	VideoOSCNote     string
 
 	EventID uint64 `gorm:"index"`
 	Event   Event
 }
 
-type OSCServer struct {
+type Client struct {
 	gorm.Model
 	ID uint64 `gorm:"primaryKey"`
 
-	Name string
-	Host string
-	Port int
+	Name  string
+	Type  string
+	IP    string
+	Port  int
+	Token string `gorm:"unique"`
 }
 
 func InitPSQLDatabase(db *gorm.DB) error {
@@ -106,9 +131,9 @@ func InitPSQLDatabase(db *gorm.DB) error {
 		return errors.New("failed to auto migrate scenes table: " + err.Error())
 	}
 
-	err = db.AutoMigrate(&OSCServer{})
+	err = db.AutoMigrate(&Client{})
 	if err != nil {
-		return errors.New("failed to auto migrate OSC server table: " + err.Error())
+		return errors.New("failed to auto migrate clients table: " + err.Error())
 	}
 
 	// Create initial admin user, if not exists (email: admin@example.com, username: admin, password: admin)

@@ -17,8 +17,11 @@ func (a *API) WebsocketConnection(c *websocket.Conn) {
 	}
 }
 
-func (a *API) SendMessage(msg []byte) {
+func (a *API) SendMessage(msg []byte, event string) {
 	for client := range a.Clients {
+		if a.Clients[client] != event {
+			continue
+		}
 		err := client.WriteMessage(websocket.TextMessage, msg)
 		if err != nil {
 			if err := client.Close(); err != nil {

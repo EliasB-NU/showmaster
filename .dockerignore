@@ -1,0 +1,15 @@
+.gitattributes
+.gitignore
+.github/
+.git/
+.vscode/
+.idea/
+config/
+selfhost/
+
+.prettierrc.json
+Dockerfile
+.editorconfig
+LICENSE
+README.md
+.dockerignore

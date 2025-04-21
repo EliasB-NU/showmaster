@@ -22,24 +22,16 @@ func CheckPermissions(headers map[string][]string, level int, subPart string, db
 	}
 
 	// Check for an matching entry in the database
-	var browserTokens []database.BrowserToken
-	result := db.Find(&browserTokens)
+	var browserToken database.BrowserToken
+	result := db.Where("token = ?", token).Find(&browserToken)
 	if result.Error != nil {
 		log.Printf("Error getting browser tokens: %v\n", result.Error)
 		return false
 	}
-	var userID uint64
-	for _, browserToken := range browserTokens {
-		if CheckStringHash(token, browserToken.Key) {
-			userID = browserToken.UserID
-			break
-
-		}
-	}
 
 	// Get the permissions for the user
 	var perms database.Permission
-	result = db.Where("member_id = ?", userID).First(&perms)
+	result = db.Where("user_id = ?", browserToken.UserID).First(&perms)
 	if result.Error != nil {
 		log.Printf("Error getting permissions: %v\n", result.Error)
 		return false

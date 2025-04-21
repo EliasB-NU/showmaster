@@ -106,11 +106,21 @@ func InitWeb(cfg *config.Config, db *gorm.DB, mst *util.MST) {
 	api.Delete("/logout", a.logout)                  // <- Token, deletes session
 	api.Post("/checkLogin", a.checkIfUserIsLoggedIn) // -> Bool&Perms, checks if the session is valid and returns the users permissions
 	// Admin
+	api.Get("/getUsers", a.getUsers)                 // <- Token, returns all users
+	api.Post("/createUser", a.addUser)               // <- Token&Email&Name&Password, creates a new user
+	api.Post("/updateUser", a.updateUser)            // <- Token&Id&Email&Name&Password, updates a user
+	api.Delete("/deleteUser/:id", a.deleteUser)      // <- Token&Id, deletes a user
+	api.Get("/getClients", a.getClients)             // <- Token, returns all clients
+	api.Post("/createClient", a.createClient)        // <- Token&Name&Type&IP&Port, creates a new client
+	api.Post("/updateClient", a.updateClient)        // <- Token&Id&Name&Type&IP&Port, updates a client
+	api.Delete("/deleteClient/:id", a.deleteClient)  // Token&Id, deletes client
+	api.Get("/clientNewToken/:id", a.createNewToken) // <- Token&Id, generates a new auth token and deletes the old one
 
 	// Events
 
 	// Scenes
 
+	// Active for low latency
 	// Web
 	showMasterApp.Static("/", "./web/dist")
 

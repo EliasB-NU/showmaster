@@ -6,14 +6,21 @@ import (
 )
 
 // HashString hashes the password using bcrypt
-func HashString(key string) (string, error) {
+func HashString(key string) string {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(key), bcrypt.DefaultCost)
-	return string(bytes), err
+	if err != nil {
+		log.Printf("Error hashing String: %v\n", err)
+		return ""
+	}
+	return string(bytes)
 }
 
 // CheckStringHash compares the plain password with the hashed one
 func CheckStringHash(key, hash string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(key))
-	log.Printf("Error comparing password: %v\n", err)
-	return err == nil
+	if err != nil {
+		log.Printf("Error comparing StringHash: %v\n", err)
+		return false
+	}
+	return true
 }

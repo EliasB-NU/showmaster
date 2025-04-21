@@ -35,6 +35,6 @@ COPY templates/ ./templates/
 
 COPY --from=builder-node /app/dist ./web/dist
 
-EXPOSE 3001 3002
+EXPOSE 3000
 
 CMD ["./main", "prod"]
