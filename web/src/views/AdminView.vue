@@ -3,13 +3,13 @@ import HeaderComponent from '@/components/HeaderComponent.vue'
 import UserEditComponent from '@/components/UserEditComponent.vue'
 import ClientEditComponent from '@/components/ClientEditComponent.vue'
 import ClientCreateComponent from '@/components/ClientCreateComponent.vue'
+import ClientTokenComponent from '@/components/ClientTokenComponent.vue'
 import UserCreateComponent from '@/components/UserCreateComponent.vue'
-import PopUp from '@/components/PopUp.vue'
 
+import PopUp from '@/components/PopUp.vue'
 import { onMounted, ref } from 'vue'
 import Cookies from 'js-cookie'
 import axios from 'axios'
-import ClientTokenComponent from '@/components/ClientTokenComponent.vue'
 
 
 const popup = ref<InstanceType<typeof PopUp> | null>(null);
@@ -37,7 +37,7 @@ async function fetchUsers() {
   loadingUsers.value = true
   try {
     await axios
-      .get('/api/getUsers', {
+      .get('/api/users', {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${Cookies.get('token')}`,
@@ -66,7 +66,7 @@ const editUser = (user: User) => {
 const deleteUser = async (id: Number) => {
   try {
     await axios
-      .delete(`/api/deleteUser/${id}`, {
+      .delete(`/api/users/delete/${id}`, {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${Cookies.get('token')}`,
@@ -105,7 +105,7 @@ async function fetchClients() {
   loadingClients.value = true
   try {
     await axios
-      .get('/api/getClients', {
+      .get('/api/clients', {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${Cookies.get('token')}`,
@@ -133,7 +133,7 @@ const editClient = (client: Client) => {
 const deleteClient = async (id: number) => {
   try {
     await axios
-    .delete(`/api/deleteClient/${id}`, {
+    .delete(`/api/clients/delete/${id}`, {
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${Cookies.get('token')}`,
@@ -157,7 +157,7 @@ const token = ref<string>('')
 const newToken = async (id: number) => {
   try {
     await axios
-      .get(`/api/clientNewToken/${id}`, {
+      .get(`/api/clients/newToken/${id}`, {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${Cookies.get('token')}`,

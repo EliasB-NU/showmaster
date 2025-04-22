@@ -38,7 +38,7 @@ const user = ref<User>({
 const createUser = async () => {
   try {
     await axios
-      .post('/api/createUser', {
+      .post('/api/users/create', {
         ...user.value,
       },{
         headers: {

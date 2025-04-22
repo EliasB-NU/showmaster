@@ -21,6 +21,12 @@ services:
       - REDIS_DB=0
     networks:
       - showmaster_network
+    healthcheck:
+      test: wget --quit --tries=1 --spider http://127.0.0.1:3000/healthcheck || exit 1
+      interval: 10s
+      timeout: 1s
+      retries: 3
+      start_period: 30s
 
   psql:
     image: postgres:latest

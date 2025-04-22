@@ -34,7 +34,7 @@ const emit = defineEmits(['close', 'clientCreated'])
 const createClient = async () => {
   try {
     await axios
-      .post('/api/createClient', {
+      .post('/api/clients/create', {
         ...client.value,
       }, {
         headers: {

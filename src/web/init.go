@@ -20,7 +20,7 @@ type API struct {
 	CFG     *config.Config
 	Clients map[*websocket.Conn]bool
 
-	LoadedEvents map[string]bool
+	LoadedEvents map[uint64]bool
 }
 
 func InitWeb(cfg *config.Config, db *gorm.DB, mst *util.MST) {
@@ -83,7 +83,7 @@ func InitWeb(cfg *config.Config, db *gorm.DB, mst *util.MST) {
 		CFG:     cfg,
 		Clients: make(map[*websocket.Conn]bool),
 
-		LoadedEvents: make(map[string]bool),
+		LoadedEvents: make(map[uint64]bool),
 	}
 	// Get all events
 	var events []database.Event
@@ -96,31 +96,41 @@ func InitWeb(cfg *config.Config, db *gorm.DB, mst *util.MST) {
 	} else if !errors.Is(err, gorm.ErrRecordNotFound) {
 		// This code is for loading the currently selected scene in the redis cache
 		for _, event := range events {
-			a.LoadedEvents[event.Name] = false
+			a.LoadedEvents[event.ID] = false
 		}
 	}
 	// Websocket
 	api.Get("/ws", websocket.New(a.WebsocketConnection))
 	// Login
-	api.Post("/login", a.login)                      // <- Email&Password, returns new session token
+	api.Post("/login", a.login)                      // <- Email&Password || ->returns new session token
 	api.Delete("/logout", a.logout)                  // <- Token, deletes session
 	api.Post("/checkLogin", a.checkIfUserIsLoggedIn) // -> Bool&Perms, checks if the session is valid and returns the users permissions
 	// Admin
-	api.Get("/getUsers", a.getUsers)                 // <- Token, returns all users
-	api.Post("/createUser", a.addUser)               // <- Token&Email&Name&Password, creates a new user
-	api.Post("/updateUser", a.updateUser)            // <- Token&Id&Email&Name&Password, updates a user
-	api.Delete("/deleteUser/:id", a.deleteUser)      // <- Token&Id, deletes a user
-	api.Get("/getClients", a.getClients)             // <- Token, returns all clients
-	api.Post("/createClient", a.createClient)        // <- Token&Name&Type&IP&Port, creates a new client
-	api.Post("/updateClient", a.updateClient)        // <- Token&Id&Name&Type&IP&Port, updates a client
-	api.Delete("/deleteClient/:id", a.deleteClient)  // Token&Id, deletes client
-	api.Get("/clientNewToken/:id", a.createNewToken) // <- Token&Id, generates a new auth token and deletes the old one
-	api.Get("/getClientType/:type", a.getClientType) // <- Token&Type, returns all clients with a specific type
+	api.Get("/users", a.getUsers)                      // <- Token || -> returns all users
+	api.Post("/users/create", a.addUser)               // <- Token&Data, creates a new user
+	api.Post("/users/update", a.updateUser)            // <- Token&Data updates a user
+	api.Delete("/users/delete/:id", a.deleteUser)      // <- Token&Id, deletes a user
+	api.Get("/clients", a.getClients)                  // <- Token || -> returns all clients
+	api.Post("/clients/create", a.createClient)        // <- Token&Data, creates a new client
+	api.Post("/clients/update", a.updateClient)        // <- Token&Id&Data, updates a client
+	api.Delete("/clients/delete/:id", a.deleteClient)  // Token&Id, deletes client
+	api.Get("/clients/newToken/:id", a.createNewToken) // <- Token&Id || -> generates a new auth token and deletes the old one
+	api.Get("/clients/byType/:type", a.getClientType)  // <- Token&Type || -> returns all clients with a specific type
 	// Events
-
+	api.Get("/events", a.getEvents)           // <- Token || -> All events & the currently loaded event
+	api.Post("/event/create", a.createEvent)  // <- Token&Data, creates new event
+	api.Post("/event/update", a.updateClient) // <- Token&Data, updates an event
+	api.Delete("/event/delete/:id")           // <- Token&Id, deletes an event
+	api.Post("/event/activate/:id")           // <- Token&Id, activates an event
 	// Scenes
-
-	// Active for low latency
+	api.Get("/scenes/:id")                  // <- Token || -> All scenes from an event
+	api.Post("/scenes/create/:id")          // <- Token&Data&id, creates a new scene in an event
+	api.Post("/scenes/update/:id")          // <- Token&Data&id, updates a scene in an event
+	api.Post("/scenes/delete/:id/:sceneId") // <- Token&id&sceneId, deletes a scene by its id from an event
+	// Timer
+	api.Get("/timer/:id")
+	api.Post("timer/:id")
+	api.Delete("timer/:id")
 	// Web
 	showMasterApp.Static("/", "./web/dist")
 

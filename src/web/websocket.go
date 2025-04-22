@@ -6,7 +6,7 @@ import (
 )
 
 func (a *API) WebsocketConnection(c *websocket.Conn) {
-	a.Clients[c] = "huhn"
+	a.Clients[c] = true
 
 	for {
 		_, p, err := c.ReadMessage()
@@ -17,9 +17,9 @@ func (a *API) WebsocketConnection(c *websocket.Conn) {
 	}
 }
 
-func (a *API) SendMessage(msg []byte, event string) {
+func (a *API) SendMessage(msg []byte) {
 	for client := range a.Clients {
-		if a.Clients[client] != event {
+		if a.Clients[client] != true {
 			continue
 		}
 		err := client.WriteMessage(websocket.TextMessage, msg)

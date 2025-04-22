@@ -20,7 +20,7 @@ const emit = defineEmits(['close', 'clientEdited'])
 const updateClient = async () => {
   try {
     await axios
-      .post('/api/updateClient', {
+      .post('/api/clients/update', {
         ...props.client,
       }, {
         headers: {

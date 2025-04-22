@@ -1,5 +1,20 @@
 <script setup lang="ts">
 import HeaderComponent from '@/components/HeaderComponent.vue'
+import { onMounted, ref } from 'vue'
+
+interface Event {
+
+}
+
+const events = ref<Event[]>([])
+
+const fetchEvents = async () => {
+
+}
+
+onMounted(async () => {
+  await fetchEvents()
+})
 
 </script>
 

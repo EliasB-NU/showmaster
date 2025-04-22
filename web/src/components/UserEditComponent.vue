@@ -21,7 +21,7 @@ const emit = defineEmits(['close', 'updatedUser'])
 const updateUser = async () => {
   try {
     await axios
-      .post('/api/updateUser', {
+      .post('/api/users/update', {
         ...props.user
       }, {
         headers: {
