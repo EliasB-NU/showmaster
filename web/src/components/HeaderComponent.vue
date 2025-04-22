@@ -42,7 +42,7 @@ const logout = async () => {
       <!-- Navigation (Desktop) -->
       <nav class="hidden md:flex space-x-6">
         <router-link to="/" :v-if="Cookies.get('admin') || Number(Cookies.get('events')) >= 1" class="hover:text-gray-300" >Home</router-link>
-        <router-link to="/events/active" :v-if="Cookies.get('admin') || Number(Cookies.get('events')) >= 1" class="hover:text-gray-300" >Active Event</router-link>
+        <router-link to="/activeEvent" :v-if="Cookies.get('admin') || Number(Cookies.get('events')) >= 1" class="hover:text-gray-300" >Active Event</router-link>
         <router-link to="/admin" :v-if="Cookies.get('admin')" class="hover:text-gray-300" >Admin</router-link>
       </nav>
 
@@ -60,7 +60,7 @@ const logout = async () => {
     <!-- Mobile Navigation -->
     <div v-if="mobileMenuOpen" class="md:hidden bg-gray-800 text-white px-4 py-6 flex flex-col space-y-4 text-lg">
       <router-link to="/" :v-if="Cookies.get('admin') || Number(Cookies.get('events')) >= 1" class="hover:text-gray-300" >Home</router-link>
-      <router-link to="/events/active" :v-if="Cookies.get('admin') || Number(Cookies.get('events')) >= 1" class="hover:text-gray-300" >Active Event</router-link>
+      <router-link to="/activeEvent" :v-if="Cookies.get('admin') || Number(Cookies.get('events')) >= 1" class="hover:text-gray-300" >Active Event</router-link>
       <router-link to="/admin" :v-if="Cookies.get('admin')" class="hover:text-gray-300" >Admin</router-link>
     </div>
   </header>

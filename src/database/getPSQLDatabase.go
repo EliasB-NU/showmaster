@@ -11,10 +11,11 @@ import (
 
 func GetPSQLDatabase(cfg *config.Config) *gorm.DB {
 	var (
-		dbURI = fmt.Sprintf("host=%s user=%s dbname=%s sslmode=disable password=%s TimeZone=%s",
+		dbURI = fmt.Sprintf("host=%s user=%s dbname=%s port=%d sslmode=disable password=%s TimeZone=%s",
 			cfg.Database.PSQL.Host,
 			cfg.Database.PSQL.User,
 			cfg.Database.PSQL.DBName,
+			cfg.Database.PSQL.Port,
 			cfg.Database.PSQL.Password,
 			cfg.Database.PSQL.TimeZone,
 		)

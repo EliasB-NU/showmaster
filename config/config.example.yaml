@@ -1,0 +1,13 @@
+Database:
+  PSQL:
+    Host: "psql.example.com"
+    Port: 5432
+    User: "showmaster"
+    Password: "password"
+    DBName: "showmaster_db"
+    Timezone: "Europe/Berlin"
+  Redis:
+    Host: "redis.example.com"
+    Port: 6379
+    Password: "password"
+    DB: 0

@@ -18,7 +18,7 @@ import (
 type API struct {
 	DB      *gorm.DB
 	CFG     *config.Config
-	Clients map[*websocket.Conn]string
+	Clients map[*websocket.Conn]bool
 
 	LoadedEvents map[string]bool
 }
@@ -81,7 +81,7 @@ func InitWeb(cfg *config.Config, db *gorm.DB, mst *util.MST) {
 	a := API{
 		DB:      db,
 		CFG:     cfg,
-		Clients: make(map[*websocket.Conn]string),
+		Clients: make(map[*websocket.Conn]bool),
 
 		LoadedEvents: make(map[string]bool),
 	}

@@ -66,12 +66,30 @@ You can use the midi implementation for syncing your consoles or the OSC impleme
 - [ ] Midi implementation
 - [ ] OSC implementation
 - [ ] GPIO implementation
+- [ ] LLLS implementation
 - [ ] Web interface
-- [ ] Web API
-- [ ] Websockets
 
 ## Integrations
 There will be an integration with my own low latency and lossless 
 video streaming service for internal use, with an integrated router 
 for video and video playback server. 
 You can also create scenes in the llls web interface and use them in your showmaster scenes.
+
+If you test the current version, yes, there will be dark mode after the initial release of v3
+
+# Local Development
+
+You need the newest Version of `golang` and the latest version of `VueJS 3`.
+
+In the `src/` folder you can find all the `golang` code and in the `web/` folder all the `VueJS` code.
+
+You can run the development version of Showmaster with the following command in the root directory `go run src/main.go dev`. 
+You need a `config.yaml` in a `config/` folder, which is included in the `.gitignore`, I provide an example version in the 
+`config/` folder.
+
+To change thinks in the frontend you need to change to the `web/` directory and run `npm run build`.
+
+You can see the frontend on [https://localhost:3000](https://localhost:3000)
+
+If you have any questions, feel free to contact me via [email](mailto:braunelias@tghd.email) or open an issue.
+ 
