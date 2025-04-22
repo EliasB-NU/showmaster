@@ -20,7 +20,12 @@ interface Client {
   port: number
 }
 
-const client = ref<Client>({} as Client)
+const client = ref<Client>({
+  name: '',
+  type: '',
+  ip: '',
+  port: 0
+})
 const token = ref<string>('')
 const tokenVisible = ref<boolean>(false)
 
@@ -30,7 +35,7 @@ const createClient = async () => {
   try {
     await axios
       .post('/api/createClient', {
-        ...client,
+        ...client.value,
       }, {
         headers: {
           'Content-Type': 'application/json',
@@ -56,9 +61,9 @@ const closePopup = () => {
 <template>
   <div v-if="visible" class="fixed inset-0 bg-opacity-50 flex items-center justify-center">
     <div class="bg-white p-6 rounded-2xl shadow-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-      <h3 class="text-lg font-semibold mb-4">Edit Member</h3>
+      <h3 class="text-lg font-semibold mb-4">Create client</h3>
 
-      <!-- Form to edit member -->
+      <!-- Form to create client -->
       <div class="mb-4">
         <form @submit.prevent="createClient">
           <div class="grid grid-cols-2 gap-4">
@@ -83,7 +88,7 @@ const closePopup = () => {
               </div>
               <div class="mb-4">
                 <label for="port" class="block">Port:</label>
-                <input v-model="client.port" id="port" type="number" class="input-field border-2 border-b-black rounded-sm" required />
+                <input v-model="client.port" id="port" type="number" min="1" max="65535" class="input-field border-2 border-b-black rounded-sm" required />
               </div>
             </div>
           </div>
@@ -97,13 +102,12 @@ const closePopup = () => {
     </div>
 
     <ClientTokenComponent
-      :content="token"
+      :token="token"
       :visible="tokenVisible"
-      @close="tokenVisible = false"
+      @close="tokenVisible = false; emit('close')"
     />
   </div>
 </template>
 
 <style scoped>
-
 </style>

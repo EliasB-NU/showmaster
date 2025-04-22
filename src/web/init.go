@@ -115,7 +115,7 @@ func InitWeb(cfg *config.Config, db *gorm.DB, mst *util.MST) {
 	api.Post("/updateClient", a.updateClient)        // <- Token&Id&Name&Type&IP&Port, updates a client
 	api.Delete("/deleteClient/:id", a.deleteClient)  // Token&Id, deletes client
 	api.Get("/clientNewToken/:id", a.createNewToken) // <- Token&Id, generates a new auth token and deletes the old one
-
+	api.Get("/getClientType/:type", a.getClientType) // <- Token&Type, returns all clients with a specific type
 	// Events
 
 	// Scenes

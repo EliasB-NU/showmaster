@@ -1,13 +1,16 @@
 <script setup lang="ts">
 import HeaderComponent from '@/components/HeaderComponent.vue'
 import UserEditComponent from '@/components/UserEditComponent.vue'
+import ClientEditComponent from '@/components/ClientEditComponent.vue'
+import ClientCreateComponent from '@/components/ClientCreateComponent.vue'
 import UserCreateComponent from '@/components/UserCreateComponent.vue'
 import PopUp from '@/components/PopUp.vue'
+
 import { onMounted, ref } from 'vue'
 import Cookies from 'js-cookie'
 import axios from 'axios'
-import ClientEditComponent from '@/components/ClientEditComponent.vue'
-import ClientCreateComponent from '@/components/ClientCreateComponent.vue'
+import ClientTokenComponent from '@/components/ClientTokenComponent.vue'
+
 
 const popup = ref<InstanceType<typeof PopUp> | null>(null);
 
@@ -28,9 +31,10 @@ const users = ref<User[]>([])
 const showCreateUser = ref<boolean>(false)
 const showEditUser = ref<boolean>(false)
 const userToEdit = ref<User>({} as User)
-const loadingUsers = ref<boolean>(false)
+const loadingUsers = ref<boolean>(true)
 
 async function fetchUsers() {
+  loadingUsers.value = true
   try {
     await axios
       .get('/api/getUsers', {
@@ -43,15 +47,14 @@ async function fetchUsers() {
         users.value = response.data
         loadingUsers.value = false
       })
-      .catch((error) => {
-        console.error('Error fetching users:', error)
-        popup.value?.show('Error fetching users')
-        loadingUsers.value = false
-      })
-  } catch (error) {
-    popup.value?.show('Error fetching users')
-    console.error('Error fetching users:', error)
-    loadingUsers.value = false
+  } catch (error: any) {
+    if (error.response.status === 404) {
+      popup.value?.show('No users found')
+    } else {
+      console.error('Error fetching users:', error)
+      popup.value?.show('Error fetching users')
+      loadingUsers.value = false
+    }
   }
 }
 
@@ -85,20 +88,21 @@ const deleteUser = async (id: Number) => {
 
 
 interface Client {
-  id: number
-  name: string
-  type: string
-  ip: string
-  port: number
+  ID: number
+  Name: string
+  Type: string
+  IP: string
+  Port: number
 }
 
 const clients = ref<Client[]>([])
-const loadingClients = ref<boolean>(false)
+const loadingClients = ref<boolean>(true)
 const showCreateClient = ref<boolean>(false)
 const showEditClient = ref<boolean>(false)
 const clientToEdit = ref<Client>({} as Client)
 
 async function fetchClients() {
+  loadingClients.value = true
   try {
     await axios
       .get('/api/getClients', {
@@ -109,9 +113,15 @@ async function fetchClients() {
       })
     .then((response) => {
       clients.value = response.data
+      loadingClients.value = false
     })
-  } catch (error) {
+  } catch (error: any) {
+    if (error.response.status === 404) {
+      popup.value?.show('No clients found')
+    }
+    console.error('Error fetching clients:', error)
     popup.value?.show('Error getting clients')
+    loadingClients.value = false
   }
 }
 
@@ -132,11 +142,36 @@ const deleteClient = async (id: number) => {
     .then((response) => {
       if (response.status === 200) {
         popup.value?.show('Successfully deleted client')
+        fetchClients()
       }
     })
   } catch (error) {
     console.error('Error deleting client:', error)
     popup.value?.show('Error deleting client')
+  }
+}
+
+const tokenVisible = ref<boolean>(false)
+const token = ref<string>('')
+
+const newToken = async (id: number) => {
+  try {
+    await axios
+      .get(`/api/clientNewToken/${id}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${Cookies.get('token')}`,
+        }
+      })
+      .then((response) => {
+        if (response.status === 200) {
+          token.value = response.data.token
+          tokenVisible.value = true
+        }
+      })
+  } catch (error: any) {
+    console.error('Error creating new token:', error)
+    popup.value?.show('Error creating new token')
   }
 }
 
@@ -198,7 +233,6 @@ onMounted(async () => {
           </table>
         </div>
 
-        <!-- MembersEditComponent Popup -->
         <UserEditComponent
           :visible="showEditUser"
           :user="userToEdit"
@@ -235,9 +269,9 @@ onMounted(async () => {
             </tr>
             </thead>
             <tbody>
-            <tr v-for="client in clients" :key="client.id" class="border-t">
-              <td class="p-3">{{ client.name }}</td>
-              <td class="p-3">{{ client.type }}</td>
+            <tr v-for="client in clients" :key="client.ID" class="border-t">
+              <td class="p-3">{{ client.Name }}</td>
+              <td class="p-3">{{ client.Type }}</td>
               <td class="p-3 flex space-x-2">
                 <button
                   v-if="Cookies.get('admin') === 'true'"
@@ -248,7 +282,14 @@ onMounted(async () => {
                 </button>
                 <button
                   v-if="Cookies.get('admin') === 'true'"
-                  @click="deleteClient(client.id)"
+                  @click="newToken(client.ID)"
+                  class="bg-gray-800 text-white px-3 py-1 rounded hover:bg-gray-700"
+                >
+                  New Token
+                </button>
+                <button
+                  v-if="Cookies.get('admin') === 'true'"
+                  @click="deleteClient(client.ID)"
                   class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
                 >
                   Delete
@@ -260,9 +301,9 @@ onMounted(async () => {
         </div>
 
         <ClientEditComponent
-          :user="clientToEdit"
-          :visible="showEditUser"
-          @close="showEditUser = false"
+          :client="clientToEdit"
+          :visible="showEditClient"
+          @close="showEditClient = false"
           @clientEdited="fetchClients"
         />
 
@@ -271,6 +312,12 @@ onMounted(async () => {
           @close="showCreateClient = false"
           @clientCreated="fetchClients"
         />
+
+        <ClientTokenComponent
+          :visible="tokenVisible"
+          :token="token"
+          @close="tokenVisible = false; token = ''"
+        />
       </div>
     </div>
     <PopUp ref="popup" />
@@ -278,5 +325,4 @@ onMounted(async () => {
 </template>
 
 <style scoped>
-
 </style>

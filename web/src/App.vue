@@ -22,10 +22,8 @@ function makeID(length: number): string {
   return result;
 }
 
-// Check if user is on route to the login page or the reset password page
-const isLoginPage = router.currentRoute.value.path === '/login'
-const isResetPasswordPage = router.currentRoute.value.path === '/resetPassword'
-if (!isLoginPage || !isResetPasswordPage) {
+// Check if user is on route to the login page
+if (router.currentRoute.value.path !== '/login') {
   // Check if the token cookies exists and if not send user to login page
   const token = Cookies.get('token')
   if (token === undefined || token.length === 0) {
