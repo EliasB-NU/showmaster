@@ -68,7 +68,7 @@ func (a *API) createClient(c *fiber.Ctx) error {
 	if data.Name == "" || data.IP == "" || data.Port < 1 || data.Port > 65535 {
 		return c.Status(fiber.StatusBadRequest).JSON("Invalid data")
 	}
-	if data.Type != "osc" && data.Type != "midi" && data.Type != "llls" && data.Type != "gpio" {
+	if data.Type != "osc" && data.Type != "midi" && data.Type != "intracast" && data.Type != "gpio" {
 		return c.Status(fiber.StatusBadRequest).JSON("Invalid data type")
 	}
 
@@ -111,7 +111,7 @@ func (a *API) updateClient(c *fiber.Ctx) error {
 	if data.Id == 0 || data.Name == "" || data.IP == "" || data.Port < 1 || data.Port > 65535 {
 		return c.Status(fiber.StatusBadRequest).JSON("Invalid data")
 	}
-	if data.Type != "osc" && data.Type != "midi" && data.Type != "llls" {
+	if data.Type != "osc" && data.Type != "midi" && data.Type != "intracast" {
 		return c.Status(fiber.StatusBadRequest).JSON("Invalid data type")
 	}
 

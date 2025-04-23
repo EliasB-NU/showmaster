@@ -79,7 +79,7 @@ const closePopup = () => {
                   <option value="osc">OSC</option>
                   <option value="midi">MIDI</option>
                   <option value="gpio">GPIO</option>
-                  <option value="llls">LLLS</option>
+                  <option value="intracast">IntraCast</option>
                 </select>
               </div>
               <div class="mb-4">

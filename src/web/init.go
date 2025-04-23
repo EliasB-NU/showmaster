@@ -21,6 +21,8 @@ type API struct {
 	Clients map[*websocket.Conn]bool
 
 	LoadedEvents map[uint64]bool
+
+	Stopwatch *util.Stopwatch
 }
 
 func InitWeb(cfg *config.Config, db *gorm.DB, mst *util.MST) {
@@ -84,6 +86,8 @@ func InitWeb(cfg *config.Config, db *gorm.DB, mst *util.MST) {
 		Clients: make(map[*websocket.Conn]bool),
 
 		LoadedEvents: make(map[uint64]bool),
+
+		Stopwatch: util.NewStopwatch(),
 	}
 	// Get all events
 	var events []database.Event
@@ -117,20 +121,20 @@ func InitWeb(cfg *config.Config, db *gorm.DB, mst *util.MST) {
 	api.Get("/clients/newToken/:id", a.createNewToken) // <- Token&Id || -> generates a new auth token and deletes the old one
 	api.Get("/clients/byType/:type", a.getClientType)  // <- Token&Type || -> returns all clients with a specific type
 	// Events
-	api.Get("/events", a.getEvents)           // <- Token || -> All events & the currently loaded event
-	api.Post("/event/create", a.createEvent)  // <- Token&Data, creates new event
-	api.Post("/event/update", a.updateClient) // <- Token&Data, updates an event
-	api.Delete("/event/delete/:id")           // <- Token&Id, deletes an event
-	api.Post("/event/activate/:id")           // <- Token&Id, activates an event
+	api.Get("/events", a.getEvents)                  // <- Token || -> All events & the currently loaded event
+	api.Post("/event/create", a.createEvent)         // <- Token&Data, creates new event
+	api.Post("/event/update", a.updateClient)        // <- Token&Data, updates an event
+	api.Delete("/event/delete/:id", a.deleteEvent)   // <- Token&Id, deletes an event
+	api.Post("/event/activate/:id", a.activateEvent) // <- Token&Id, activates an event
 	// Scenes
-	api.Get("/scenes/:id")                  // <- Token || -> All scenes from an event
-	api.Post("/scenes/create/:id")          // <- Token&Data&id, creates a new scene in an event
-	api.Post("/scenes/update/:id")          // <- Token&Data&id, updates a scene in an event
-	api.Post("/scenes/delete/:id/:sceneId") // <- Token&id&sceneId, deletes a scene by its id from an event
+	api.Get("/scenes/:id", a.getScenes)                    // <- Token || -> All scenes from an event
+	api.Post("/scenes/create/:id", a.createScene)          // <- Token&Data&id, creates a new scene in an event
+	api.Post("/scenes/update/:id", a.updateScene)          // <- Token&Data&id, updates a scene in an event
+	api.Post("/scenes/delete/:id/:sceneId", a.deleteScene) // <- Token&id&sceneId, deletes a scene by its id from an event
 	// Timer
-	api.Get("/timer/:id")
-	api.Post("timer/:id")
-	api.Delete("timer/:id")
+	api.Get("/timer", a.getTimer)      // <- Token || -> time.Duration of the timer of the active project
+	api.Post("timer", a.updateTimer)   // <-Token&Command, updates the state of the timer of the active project (start, stop, resume)
+	api.Delete("timer", a.deleteTimer) // <- Token, deletes the time.Duration of the timer of the active project (extra permission)
 	// Web
 	showMasterApp.Static("/", "./web/dist")
 

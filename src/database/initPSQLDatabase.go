@@ -66,27 +66,67 @@ type SceneEntries struct {
 	SceneName        string
 	SceneDescription string
 
-	Audio            string
+	ExecutesIn time.Duration // The time in which this scene is loaded, starting from the selection of the previous one
+
+	// Audio
+	Audio string
+	// Audio - Clients
+	// Audio - Clients - Midi
 	AudioMidiEnabled bool
+	AudioMidiClient  uint64
 	AudioMidiChannel int
 	AudioMidiNote    string
-	AudioOSCEnabled  bool
-	AudioOSCChannel  int
-	AudioOSCNote     string
-	Light            string
+	// Audio - Clients - OSC
+	AudioOSCEnabled bool
+	AudioOSCClient  uint64
+	AudioOSCChannel int
+	AudioOSCNote    string
+	// Audio - Clients - GPIO
+	AudioGPIOEnabled bool
+	AudioGPIOClient  uint64
+	AudioGPIOChannel int
+	AudioGPIONote    string
+	// Light
+	Light string
+	// Light - Clients
+	// Light - Clients - Midi
 	LightMidiEnabled bool
+	LightMidiClient  uint64
 	LightMidiChannel int
 	LightMidiNote    string
-	LightOSCEnabled  bool
-	LightOSCChannel  int
-	LightOSCNote     string
-	Video            string
+	// Light - Clients - OSC
+	LightOSCEnabled bool
+	LightOSCClient  uint64
+	LightOSCChannel int
+	LightOSCNote    string
+	// Light - Clients - GPIO
+	LightGPIOEnabled bool
+	LightGPIOClient  uint64
+	LightGPIOChannel int
+	LightGPIONote    string
+	// Video
+	Video string
+	// Video - Clients
+	// Video - Clients - Midi
 	VideoMidiEnabled bool
+	VideoMidiClient  uint64
 	VideoMidiChannel int
 	VideoMidiNote    string
-	VideoOSCEnabled  bool
-	VideoOSCChannel  int
-	VideoOSCNote     string
+	// Video - Clients - OSC
+	VideoOSCEnabled bool
+	VideoOSCClient  uint64
+	VideoOSCChannel int
+	VideoOSCNote    string
+	// Video - Clients - GPIO
+	VideoGPIOEnabled bool
+	VideoGPIOClient  uint64
+	VideoGPIOChannel int
+	VideoGPIONote    string
+	// Video - Clients - IntraCast
+	VideoIntraCastEnabled bool
+	VideoIntraCastClient  uint64
+	VideoIntraCastChannel int
+	VideoIntraCastNote    string
 
 	EventID uint64 `gorm:"index"`
 	Event   Event
