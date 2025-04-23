@@ -1,3 +1,5 @@
+![Showmaster Logo](/assets/Showmaster-Logo-RemovedBackground.png)
+
 # Showmaster
 
 I am currently rewriting the whole project in a more modular way and
