@@ -6,7 +6,7 @@ import (
 )
 
 func (a *API) getTimer(c *fiber.Ctx) error {
-	if !util.CheckPermissions(c.GetReqHeaders(), 1, "event", a.DB) {
+	if !util.CheckPermissions(c.GetReqHeaders(), 1, util.Events, a.DB) {
 		return c.Status(fiber.StatusForbidden).JSON("Invalid Permission")
 	}
 
@@ -19,7 +19,7 @@ func (a *API) updateTimer(c *fiber.Ctx) error {
 			Status string `json:"status"`
 		}{}
 	)
-	if !util.CheckPermissions(c.GetReqHeaders(), 1, "event", a.DB) {
+	if !util.CheckPermissions(c.GetReqHeaders(), 1, util.Events, a.DB) {
 		return c.Status(fiber.StatusForbidden).JSON("Invalid Permission")
 	}
 	// Parse&validate body
@@ -51,7 +51,7 @@ func (a *API) updateTimer(c *fiber.Ctx) error {
 }
 
 func (a *API) deleteTimer(c *fiber.Ctx) error {
-	if !util.CheckPermissions(c.GetReqHeaders(), 2, "event", a.DB) {
+	if !util.CheckPermissions(c.GetReqHeaders(), 2, util.Events, a.DB) {
 		return c.Status(fiber.StatusForbidden).JSON("Invalid Permission")
 	}
 

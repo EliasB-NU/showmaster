@@ -128,10 +128,12 @@ func InitWeb(cfg *config.Config, db *gorm.DB, mst *util.MST) {
 	api.Delete("/event/delete/:id", a.deleteEvent)   // <- Token&Id, deletes an event
 	api.Post("/event/activate/:id", a.activateEvent) // <- Token&Id, activates an event
 	// Scenes
-	api.Get("/scenes/:id", a.getScenes)                    // <- Token || -> All scenes from an event
-	api.Post("/scenes/create/:id", a.createScene)          // <- Token&Data&id, creates a new scene in an event
-	api.Post("/scenes/update/:id", a.updateScene)          // <- Token&Data&id, updates a scene in an event
-	api.Post("/scenes/delete/:id/:sceneId", a.deleteScene) // <- Token&id&sceneId, deletes a scene by its id from an event
+	api.Get("/scenes/:id", a.getScenes)                                // <- Token || -> All scenes from an event
+	api.Post("/scenes/create/:id", a.createScene)                      // <- Token&Data&id, creates a new scene in an event
+	api.Post("/scenes/update/", a.updateScene)                         // <- Token&Data&id, updates a scene in an event
+	api.Post("/scenes/updateActive/:id/:sceneId", a.updateActiveScene) // Token&id%sceneId,  update the currently active scene
+	api.Post("/scenes/test/:id", a.testScene)                          // Token&id, id here id of the scene, runs the midi/osc/gpio/intracast data for testing, has bigger delay
+	api.Delete("/scenes/delete/:id", a.deleteScene)                    // <- Token&id, id here id of the scene, deletes a scene by its id from an event
 	// Timer
 	api.Get("/timer", a.getTimer)      // <- Token || -> time.Duration of the timer of the active project
 	api.Post("timer", a.updateTimer)   // <-Token&Command, updates the state of the timer of the active project (start, stop, resume)

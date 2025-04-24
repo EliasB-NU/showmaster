@@ -166,7 +166,7 @@ onMounted(async () => {
                 <p class="text-sm p-1"><span class="font-bold">Time Elapsed:</span> {{ formatDuration(event.TimeElapsed) }}</p>
               </div>
               <div class="grid gap-5 grid-cols-1">
-                <button @click="router.push(`/event/${event.ID}`)" class="px-4 py-2 bg-gray-800 text-white text-sm rounded hover:bg-gray-700">Open</button>
+                <button @click="router.push(`/event/${event.ID}`)" v-if="(Cookies.get('admin') || Number(Cookies.get('events')) >= 1) && event.ID !== loadedEvent" class="px-4 py-2 bg-gray-800 text-white text-sm rounded hover:bg-gray-700">Open</button>
                 <button @click="editEvent(event)" v-if="Cookies.get('admin') || Number(Cookies.get('events')) >= 2" class="px-4 py-2 bg-gray-800 text-white text-sm rounded hover:bg-gray-700">Edit</button>
                 <button @click="deleteEvent(event.ID)" v-if="Cookies.get('admin') || Number(Cookies.get('events')) >= 3" class="px-4 py-2 bg-red-500 text-white text-sm rounded hover:bg-red-600">Delete</button>
                 <button

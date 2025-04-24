@@ -55,10 +55,10 @@ type Event struct {
 	CurrentScene int
 	TimeElapsed  time.Duration
 
-	Scenes []SceneEntries
+	Scenes []SceneEntrie
 }
 
-type SceneEntries struct {
+type SceneEntrie struct {
 	gorm.Model
 	ID uint64 `gorm:"primaryKey"`
 
@@ -166,7 +166,7 @@ func InitPSQLDatabase(db *gorm.DB) error {
 		return errors.New("failed to auto migrate events table: " + err.Error())
 	}
 
-	err = db.AutoMigrate(&SceneEntries{})
+	err = db.AutoMigrate(&SceneEntrie{})
 	if err != nil {
 		return errors.New("failed to auto migrate scenes table: " + err.Error())
 	}

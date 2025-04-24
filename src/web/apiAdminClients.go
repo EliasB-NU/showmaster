@@ -10,7 +10,7 @@ import (
 )
 
 func (a *API) getClients(c *fiber.Ctx) error {
-	if !util.CheckPermissions(c.GetReqHeaders(), 3, "admin", a.DB) {
+	if !util.CheckPermissions(c.GetReqHeaders(), 3, util.Admin, a.DB) {
 		return fiber.NewError(fiber.StatusForbidden)
 	}
 
@@ -28,7 +28,7 @@ func (a *API) getClients(c *fiber.Ctx) error {
 }
 
 func (a *API) getClientType(c *fiber.Ctx) error {
-	if !util.CheckPermissions(c.GetReqHeaders(), 2, "event", a.DB) {
+	if !util.CheckPermissions(c.GetReqHeaders(), 2, util.Events, a.DB) {
 		return fiber.NewError(fiber.StatusForbidden)
 	}
 
@@ -58,7 +58,7 @@ func (a *API) createClient(c *fiber.Ctx) error {
 
 		err error
 	)
-	if !util.CheckPermissions(c.GetReqHeaders(), 3, "admin", a.DB) {
+	if !util.CheckPermissions(c.GetReqHeaders(), 3, util.Admin, a.DB) {
 		return c.Status(fiber.StatusForbidden).JSON("")
 	}
 	// Parse & validate body
@@ -100,7 +100,7 @@ func (a *API) updateClient(c *fiber.Ctx) error {
 		client database.Client
 		err    error
 	)
-	if !util.CheckPermissions(c.GetReqHeaders(), 3, "admin", a.DB) {
+	if !util.CheckPermissions(c.GetReqHeaders(), 3, util.Admin, a.DB) {
 		return c.Status(fiber.StatusForbidden).JSON("")
 	}
 	// Parse & validate body

@@ -2,7 +2,10 @@
 import Cookies from 'js-cookie'
 import { onMounted, ref } from 'vue'
 import axios from 'axios'
+import { useRoute } from 'vue-router'
 import router from '@/router'
+
+const route = useRoute()
 
 const mobileMenuOpen = ref<boolean>(false)
 
@@ -70,7 +73,10 @@ onMounted(() => {
   <header class="w-full bg-gray-800 text-white shadow-md">
     <div class="max-w-7xl mx-auto px-6 flex justify-between items-center h-16">
       <!-- Logo -->
-      <router-link to="/" class="text-xl font-semibold">
+      <router-link v-if="eventID === 0" to="/" class="text-xl font-semibold">
+        Showmaster V3
+      </router-link>
+      <router-link v-else to="/" class="text-xl font-semibold">
         Showmaster V3 || {{ eventName }}
       </router-link>
 

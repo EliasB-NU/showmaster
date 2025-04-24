@@ -12,7 +12,7 @@ import (
 )
 
 func (a *API) getEvents(c *fiber.Ctx) error {
-	if !util.CheckPermissions(c.GetReqHeaders(), 1, "event", a.DB) {
+	if !util.CheckPermissions(c.GetReqHeaders(), 1, util.Events, a.DB) {
 		return c.Status(fiber.StatusForbidden).JSON("")
 	}
 
@@ -49,7 +49,7 @@ func (a *API) createEvent(c *fiber.Ctx) error {
 		event database.Event
 		err   error
 	)
-	if !util.CheckPermissions(c.GetReqHeaders(), 2, "event", a.DB) {
+	if !util.CheckPermissions(c.GetReqHeaders(), 2, util.Events, a.DB) {
 		return c.Status(fiber.StatusForbidden).JSON("")
 	}
 	// Parse&validate data
@@ -89,7 +89,7 @@ func (a *API) updateEvent(c *fiber.Ctx) error {
 		event database.Event
 		err   error
 	)
-	if !util.CheckPermissions(c.GetReqHeaders(), 2, "event", a.DB) {
+	if !util.CheckPermissions(c.GetReqHeaders(), 2, util.Events, a.DB) {
 		return c.Status(fiber.StatusForbidden).JSON("")
 	}
 	if err := c.BodyParser(&data); err != nil {
@@ -124,7 +124,7 @@ func (a *API) updateEvent(c *fiber.Ctx) error {
 }
 
 func (a *API) deleteEvent(c *fiber.Ctx) error {
-	if !util.CheckPermissions(c.GetReqHeaders(), 3, "event", a.DB) {
+	if !util.CheckPermissions(c.GetReqHeaders(), 3, util.Events, a.DB) {
 		return c.Status(fiber.StatusForbidden).JSON("")
 	}
 
@@ -159,7 +159,7 @@ func (a *API) activateEvent(c *fiber.Ctx) error {
 }
 
 func (a *API) getEventName(c *fiber.Ctx) error {
-	if !util.CheckPermissions(c.GetReqHeaders(), 1, "event", a.DB) {
+	if !util.CheckPermissions(c.GetReqHeaders(), 1, util.Events, a.DB) {
 		return c.Status(fiber.StatusForbidden).JSON("")
 	}
 

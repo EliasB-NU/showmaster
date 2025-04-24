@@ -37,4 +37,5 @@ yarn-error.log
 config/config.yaml
 
 .tmp
+tmp
 
