@@ -1,10 +1,15 @@
 <script setup lang="ts">
+import PopUp from '@/components/PopUp.vue'
+import EventCreateComponent from '@/components/EventCreateComponent.vue'
 import HeaderComponent from '@/components/HeaderComponent.vue'
 
 import { onMounted, ref } from 'vue'
 import axios from 'axios'
 import Cookies from 'js-cookie'
-import CreateEventComponent from '@/components/CreateEventComponent.vue'
+import router from '@/router'
+import EventEditComponent from '@/components/EventEditComponent.vue'
+
+const popup = ref<InstanceType<typeof PopUp>| null>(null)
 
 interface Event {
   ID: number
@@ -39,7 +44,7 @@ const fetchEvents = async () => {
       })
   } catch (error) {
     console.log(error)
-
+    popup.value?.show('Error fetching events.')
   }
 }
 
@@ -61,11 +66,63 @@ const formatDuration = (seconds: number): string => {
   return `${hrs}h ${mins}m ${secs}s`
 }
 
+const deleteEvent = async (id: number) => {
+  try {
+    await axios
+      .delete(`/api/event/delete/${id}`, {
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${Cookies.get('token')}`,
+        }
+      })
+    .then(_ => {
+      popup.value?.show('Successfully deleted event.')
+      fetchEvents()
+    })
+  } catch (error) {
+    console.log(error)
+    popup.value?.show('Error deleting event.')
+  }
+}
+
+const activateEvent = async (id: number) => {
+  if (loadedEvent.value === id) {
+    popup.value?.show("Already activated")
+    return
+  }
+  try {
+    await axios
+      .post(`/api/event/activate/${id}`, {}, {
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${Cookies.get('token')}`,
+        }
+      })
+      .then(_ => {
+        popup.value?.show("Event activated.")
+        loadedEvent.value = id
+    })
+  } catch (error) {
+    console.log(error)
+    popup.value?.show("Error deleting event.")
+  }
+}
+
 const showCreateModal = ref<boolean>(false)
 
 const eventCreated = async () => {
   showCreateModal.value = false
   await fetchEvents()
+}
+
+const showEditModal = ref<boolean>(false)
+const toEditEvent = ref<Event>({} as Event)
+
+const editEvent = (event: Event) => {
+  toEditEvent.value = event
+  showEditModal.value = true
 }
 
 onMounted(async () => {
@@ -84,35 +141,38 @@ onMounted(async () => {
         <div class="flex justify-end mb-6">
           <button
             @click="showCreateModal = true"
-            class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded"
+            class="bg-gray-800 hover:bg-gray-700 text-white font-medium px-4 py-2 rounded"
           >
-            + Create Event
+            Create Event
           </button>
         </div>
 
         <!-- Loading State -->
         <p v-if="loading" class="text-gray-500">Loading...</p>
         <!-- All events -->
-        <div v-else class="grid gap-10 md:grid-cols-2 lg:grid-cols-5">
+        <div v-else class="grid gap-10 md:grid-cols-2">
           <div
             v-for="event in events"
             :key="event.ID"
             class="bg-white rounded-xl shadow-sm hover:shadow-md transition overflow-hidden"
           >
-            <div class="grid gap-15 grid-cols-2">
+            <div class="grid gap-15 grid-cols-2 p-2">
               <div>
-                <h3 class="text-xl font-semibold mb-1">{{ event.Name }}</h3>
-                <p class="text-sm text-gray-600 mb-2">{{ event.Description }}</p>
-                <p class="text-sm"><span class="font-medium">Location:</span> {{ event.Location }}</p>
-                <p class="text-sm"><span class="font-medium">Start:</span> {{ formatDate(event.StartDate) }}</p>
-                <p class="text-sm"><span class="font-medium">End:</span> {{ formatDate(event.EndDate) }}</p>
-                <p class="text-sm"><span class="font-medium">Time Elapsed:</span> {{ formatDuration(event.TimeElapsed) }}</p>
+                <h3 class="text-xl font-semibold mb-1 p-1">{{ event.Name }}</h3>
+                <p class="text-sm text-gray-600 mb-2 p-1">{{ event.Description }}</p>
+                <p class="text-sm p-1"><span class="font-bold">Location:</span> {{ event.Location }}</p>
+                <p class="text-sm p-1"><span class="font-bold">Start:</span> {{ formatDate(event.StartDate) }}</p>
+                <p class="text-sm p-1"><span class="font-bold">End:</span> {{ formatDate(event.EndDate) }}</p>
+                <p class="text-sm p-1"><span class="font-bold">Time Elapsed:</span> {{ formatDuration(event.TimeElapsed) }}</p>
               </div>
-              <div>
-                <button class="px-4 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700">Edit</button>
-                <button class="px-4 py-2 bg-red-500 text-white text-sm rounded hover:bg-red-600">Delete</button>
+              <div class="grid gap-5 grid-cols-1">
+                <button @click="router.push(`/event/${event.ID}`)" class="px-4 py-2 bg-gray-800 text-white text-sm rounded hover:bg-gray-700">Open</button>
+                <button @click="editEvent(event)" v-if="Cookies.get('admin') || Number(Cookies.get('events')) >= 2" class="px-4 py-2 bg-gray-800 text-white text-sm rounded hover:bg-gray-700">Edit</button>
+                <button @click="deleteEvent(event.ID)" v-if="Cookies.get('admin') || Number(Cookies.get('events')) >= 3" class="px-4 py-2 bg-red-500 text-white text-sm rounded hover:bg-red-600">Delete</button>
                 <button
+                  v-if="Cookies.get('admin') || Number(Cookies.get('events')) >= 2"
                   class="px-4 py-2 text-sm rounded"
+                  @click="activateEvent(event.ID)"
                   :class="event.ID === loadedEvent ? 'bg-green-300 text-green-900' : 'bg-green-600 text-white hover:bg-green-700'"
                 >
                   {{ event.ID === loadedEvent ? 'Active' : 'Activate' }}
@@ -122,11 +182,19 @@ onMounted(async () => {
 
           </div>
         </div>
+        <PopUp ref="popup" />
       </div>
 
-      <CreateEventComponent
+      <EventCreateComponent
+        v-if="showCreateModal"
         @close="showCreateModal = false"
         @created="eventCreated"
+      />
+
+      <EventEditComponent
+        v-if="showEditModal"
+        :event="toEditEvent"
+        @close="showEditModal = false"
       />
     </div>
   </div>

@@ -123,7 +123,7 @@ func InitWeb(cfg *config.Config, db *gorm.DB, mst *util.MST) {
 	// Events
 	api.Get("/events", a.getEvents)                  // <- Token || -> All events & the currently loaded event
 	api.Post("/event/create", a.createEvent)         // <- Token&Data, creates new event
-	api.Post("/event/update", a.updateClient)        // <- Token&Data, updates an event
+	api.Post("/event/update", a.updateEvent)         // <- Token&Data, updates an event
 	api.Delete("/event/delete/:id", a.deleteEvent)   // <- Token&Id, deletes an event
 	api.Post("/event/activate/:id", a.activateEvent) // <- Token&Id, activates an event
 	// Scenes
