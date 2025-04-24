@@ -157,3 +157,22 @@ func (a *API) activateEvent(c *fiber.Ctx) error {
 
 	return c.Status(fiber.StatusOK).JSON("Event activated")
 }
+
+func (a *API) getEventName(c *fiber.Ctx) error {
+	if !util.CheckPermissions(c.GetReqHeaders(), 1, "event", a.DB) {
+		return c.Status(fiber.StatusForbidden).JSON("")
+	}
+
+	var id, _ = strconv.ParseUint(c.Params("id"), 10, 64)
+	var event database.Event
+	err := a.DB.First(&event, id).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return c.Status(fiber.StatusNotFound).JSON("Event not found")
+		}
+		log.Printf("Error getting event: %v\n", err)
+		return c.Status(fiber.StatusInternalServerError).JSON("Error getting event")
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"name": event.Name})
+}
