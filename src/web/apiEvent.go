@@ -140,13 +140,16 @@ func (a *API) deleteEvent(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON("Event deleted")
 }
 
+// activateEvent loads the event in the cache, only on event can be active at the same time
 func (a *API) activateEvent(c *fiber.Ctx) error {
 	if !util.CheckPermissions(c.GetReqHeaders(), 3, "event", a.DB) {
 		return c.Status(fiber.StatusForbidden).JSON("")
 	}
 
+	// Get the ID from the url parameter
 	var id, _ = strconv.ParseUint(c.Params("id"), 10, 64)
 
+	// Unload all old events and load the new event
 	for e := range a.LoadedEvents {
 		if a.LoadedEvents[e] {
 			a.LoadedEvents[e] = false
@@ -154,6 +157,8 @@ func (a *API) activateEvent(c *fiber.Ctx) error {
 			a.LoadedEvents[e] = true
 		}
 	}
+
+	// Load the event id into redis, so on a program restart, it is instantly loaded again
 
 	return c.Status(fiber.StatusOK).JSON("Event activated")
 }

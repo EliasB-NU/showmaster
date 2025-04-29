@@ -22,13 +22,14 @@ func main() {
 	var CFG = config.GetConfig()
 
 	// Database
+	// Postgresql
 	var PSQL = database.GetPSQLDatabase(CFG)
 	err := database.InitPSQLDatabase(PSQL)
 	if err != nil {
 		log.Fatal("Error initializing PSQL database: ", err)
 	}
 
-	// Takes the longest, so time is measured here
+	// Redis
 	var REDIS = database.GetRedisDatabase(CFG)
 
 	// Routines

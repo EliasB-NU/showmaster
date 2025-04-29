@@ -68,14 +68,15 @@ You can use the midi implementation for syncing your consoles or the OSC impleme
 - [ ] Midi implementation
 - [ ] OSC implementation
 - [ ] GPIO implementation
-- [ ] LLLS implementation
+- [ ] [IntraCast](https://github.com/EliasB-NU/IntraCast) implementation
 - [ ] Web interface
 
 ## Integrations
 There will be an integration with my own low latency and lossless 
 video streaming service for internal use, with an integrated router 
 for video and video playback server. 
-You can also create scenes in the llls web interface and use them in your showmaster scenes.
+You can also create scenes in the [IntraCast](https://github.com/EliasB-NU/IntraCast) web interface 
+and use them in your showmaster scenes.
 
 If you test the current version, yes, there will be dark mode after the initial release of v3
 
@@ -88,6 +89,8 @@ In the `src/` folder you can find all the `golang` code and in the `web/` folder
 You can run the development version of Showmaster with the following command in the root directory `go run src/main.go dev`. 
 You need a `config.yaml` in a `config/` folder, which is included in the `.gitignore`, I provide an example version in the 
 `config/` folder.
+
+For tests with the API, in the `bruno/` folder you can find example requests, you need [bruno](https://www.usebruno.com/) to use them.
 
 To change thinks in the frontend you need to change to the `web/` directory and run `npm run build`.
 
