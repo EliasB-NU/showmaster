@@ -2,10 +2,7 @@
 import Cookies from 'js-cookie'
 import { onMounted, ref } from 'vue'
 import axios from 'axios'
-import { useRoute } from 'vue-router'
 import router from '@/router'
-
-const route = useRoute()
 
 const mobileMenuOpen = ref<boolean>(false)
 
@@ -29,7 +26,7 @@ async function getEventName() {
         headers: {
           'Content-Type': 'application/json',
           Accept: 'application/json',
-          Authorization: `Bearer ${Cookies.get('token')}`,
+          'Authorization': `Bearer ${Cookies.get('token')}`,
         }
       })
       .then(response => {

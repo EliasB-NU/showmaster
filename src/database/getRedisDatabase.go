@@ -2,26 +2,32 @@ package database
 
 import (
 	"context"
-	"github.com/redis/go-redis/v9"
+	"github.com/redis/rueidis"
 	"log"
 	"showmaster/src/config"
 )
 
-func GetRedisDatabase(cfg *config.Config) *redis.Client {
-	ctx := context.Background()
-
-	rdp := redis.NewClient(&redis.Options{
-		Addr:     cfg.Database.Redis.Host + ":" + cfg.Database.Redis.Port,
-		Password: cfg.Database.Redis.Password,
-		DB:       cfg.Database.Redis.DB,
+// GetRedisDatabase returns a rueidis.Client with the cfg config.Config provided
+func GetRedisDatabase(cfg *config.Config) *rueidis.Client {
+	// Get a new client
+	client, err := rueidis.NewClient(rueidis.ClientOption{
+		Username:    cfg.Database.Redis.User,
+		Password:    cfg.Database.Redis.Password,
+		InitAddress: []string{cfg.Database.Redis.Host + ":" + cfg.Database.Redis.Port},
+		SelectDB:    cfg.Database.Redis.DB,
 	})
-
-	_, err := rdp.Ping(ctx).Result()
 	if err != nil {
-		log.Fatalf("Could not connect to Redis database: %v", err)
+		log.Fatalf("Error connecting to Redis: %v\n", err)
 		return nil
 	}
 
-	log.Println("Connected to Redis database")
-	return rdp
+	// Quick ping test
+	ctx := context.Background()
+	err = client.Do(ctx, client.B().Ping().Build()).Error()
+	if err != nil {
+		log.Fatalf("Error pinging Redis: %v\n", err)
+		return nil
+	}
+
+	return &client
 }

@@ -29,12 +29,12 @@ func main() {
 	}
 
 	// Takes the longest, so time is measured here
-	database.GetRedisDatabase(CFG)
+	var REDIS = database.GetRedisDatabase(CFG)
 
 	// Routines
 	util.DeleteOldSessions(PSQL)
 	util.DeleteSoftDeletedUserKeys(PSQL)
 
 	// Web
-	web.InitWeb(CFG, PSQL, &mst)
+	web.InitWeb(CFG, PSQL, REDIS, &mst)
 }

@@ -3,10 +3,60 @@ package web
 import (
 	"github.com/gofiber/websocket/v2"
 	"log"
+	"showmaster/src/database"
 )
 
 func (a *API) WebsocketConnection(c *websocket.Conn) {
 	a.Clients[c] = true
+
+	type DataElement struct {
+		ID          uint64  `json:"id"`
+		SceneID     float64 `json:"scene_id"`
+		SceneName   string  `json:"scene_name"`
+		Audio       string  `json:"audio"`
+		Light       string  `json:"light"`
+		Video       string  `json:"video"`
+		Description string  `json:"description"`
+	}
+	var (
+		activeEventID uint64
+		data          []DataElement
+		scenes        []database.SceneEntrie
+
+		err error
+	)
+
+	for event := range a.LoadedEvents {
+		if a.LoadedEvents[event] {
+			activeEventID = event
+			return
+		}
+		continue
+	}
+
+	err = a.DB.Where("event_id = ?", activeEventID).Find(&scenes).Error
+	if err != nil {
+		log.Printf("Error getting scenes: %v\n", err)
+		return
+	}
+	for _, scene := range scenes {
+		var element DataElement
+		element.ID = scene.ID
+		element.SceneID = scene.SceneID
+		element.SceneName = scene.SceneName
+		element.Audio = scene.Audio
+		element.Light = scene.Light
+		element.Video = scene.Video
+		element.Description = scene.SceneDescription
+
+		data = append(data, element)
+	}
+
+	err = c.WriteJSON(data)
+	if err != nil {
+		log.Printf("Error writing data: %v\n", err)
+		return
+	}
 
 	for {
 		_, p, err := c.ReadMessage()

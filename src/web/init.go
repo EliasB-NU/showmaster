@@ -7,6 +7,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/healthcheck"
 	"github.com/gofiber/fiber/v2/middleware/monitor"
 	"github.com/gofiber/websocket/v2"
+	"github.com/redis/rueidis"
 	"gorm.io/gorm"
 	"log"
 	"showmaster/src/config"
@@ -17,6 +18,7 @@ import (
 
 type API struct {
 	DB      *gorm.DB
+	Redis   *rueidis.Client
 	CFG     *config.Config
 	Clients map[*websocket.Conn]bool
 
@@ -25,7 +27,7 @@ type API struct {
 	Stopwatch *util.Stopwatch
 }
 
-func InitWeb(cfg *config.Config, db *gorm.DB, mst *util.MST) {
+func InitWeb(cfg *config.Config, db *gorm.DB, redis *rueidis.Client, mst *util.MST) {
 	var (
 		addrShowMaster = "0.0.0.0:3000"
 
@@ -82,6 +84,7 @@ func InitWeb(cfg *config.Config, db *gorm.DB, mst *util.MST) {
 	showMasterApp.Mount("/api", api)
 	a := API{
 		DB:      db,
+		Redis:   redis,
 		CFG:     cfg,
 		Clients: make(map[*websocket.Conn]bool),
 

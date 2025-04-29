@@ -21,6 +21,7 @@ type Config struct {
 			Host     string `yaml:"Host"`
 			Port     string `yaml:"Port"`
 			DB       int    `yaml:"DB"`
+			User     string `yaml:"User"`
 			Password string `yaml:"Password"`
 		} `yaml:"Redis"`
 	} `yaml:"Database"`
@@ -57,6 +58,7 @@ func GetConfig() *Config {
 		config.Database.Redis.Host = os.Getenv("REDIS_HOST")
 		config.Database.Redis.Port = os.Getenv("REDIS_PORT")
 		config.Database.Redis.DB, _ = strconv.Atoi(os.Getenv("REDIS_DB"))
+		config.Database.Redis.User = os.Getenv("REDIS_USER")
 		config.Database.Redis.Password = os.Getenv("REDIS_PASSWORD")
 	} else {
 		panic("Invalid environment")
