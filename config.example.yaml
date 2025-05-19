@@ -9,5 +9,6 @@ Database:
   Redis:
     Host: "redis.example.com"
     Port: 6379
+    User: "showmaster"
     Password: "password"
     DB: 0

@@ -10,9 +10,9 @@ All versions below v2.3 will never be updated or even locked
 at by me again xD.
 
 | Version | Supported          |
-| ------- | ------------------ |
+|---------|--------------------|
 | 3.x     | :white_check_mark: |
-| 2.^3.x  | Only if requested  |
+| 2.3.x   | Only if requested  |
 | 1.x     | :x:                |
 
 ## Reporting a Vulnerability
