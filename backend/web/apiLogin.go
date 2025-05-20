@@ -85,7 +85,8 @@ func (a *API) login(c *fiber.Ctx) error {
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"token": token,
-		"perms": perms,
+		"role":  perms.Role,
+		"level": perms.Level,
 	})
 }
 
@@ -158,6 +159,7 @@ func (a *API) checkIfUserIsLoggedIn(c *fiber.Ctx) error {
 	}
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"perms": perms,
+		"role":  perms.Role,
+		"level": perms.Level,
 	})
 }

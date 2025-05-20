@@ -80,13 +80,16 @@ func InitWeb(psql *gorm.DB, rdb *redis.Client, ctx context.Context, cfg *config.
 
 	// API
 	apiV1 := fiber.New()
-	showmasterAPP.Mount("/api/v1/", apiV1)
+	showmasterAPP.Mount("/api/v1", apiV1)
 	// Websocket
 	apiV1.Get("/ws", websocket.New(a.WebsocketConnection))
 	// Login
+	apiV1.Post("/login", a.login)                      // <- Email&Password&DeviceID || -> returns new session token
+	apiV1.Delete("/logout", a.logout)                  // <- Token, deletes token
+	apiV1.Post("/checkLogin", a.checkIfUserIsLoggedIn) // <- Token&DeviceID || -> Bool&Perms, checks if the session is valid and returns the users permissions
 	// Admin
 	// Web
-	showmasterAPP.Static("/", "./frontend/dist")
+	showmasterAPP.Static("/", "./frontend/dist/")
 
 	// Start Web
 	mst.ElapsedTime()

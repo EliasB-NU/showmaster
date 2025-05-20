@@ -10,7 +10,7 @@ const password = ref('')
 const handleLogin = async () => {
   try {
     await axios
-      .post('/api/login', {
+      .post('/api/v1/login', {
         email: email.value,
         password: password.value,
         deviceId: Cookies.get('deviceId'),
@@ -23,8 +23,8 @@ const handleLogin = async () => {
       .then((res) => {
         if (res.status === 200) {
           Cookies.set('token', res.data.token)
-          Cookies.set('admin', res.data.perms.admin);
-          Cookies.set('events', res.data.perms.events);
+          Cookies.set('role', res.data.role)
+          Cookies.set('level', res.data.level)
           router.push({ name: 'home' })
         } else {
           popUp.value?.show("Login failed")

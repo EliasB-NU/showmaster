@@ -5,6 +5,7 @@ import HeaderComponent from '@/components/HeaderComponent.vue'
 <template>
   <div>
     <HeaderComponent />
+    <h1>Da krachts</h1>
   </div>
 </template>
 

@@ -45,8 +45,8 @@ if (router.currentRoute.value.path !== '/login') {
       )
       .then(res => {
         if (res.status === 200) {
-          Cookies.set('admin', res.data.perms.admin);
-          Cookies.set('events', res.data.perms.events);
+          Cookies.set('role', res.data.role)
+          Cookies.set('level', res.data.level)
         } else {
           // Token is not valid, send user to login page
           Cookies.remove('token')
